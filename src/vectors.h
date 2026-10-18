@@ -1,5 +1,7 @@
 #ifndef VECTORS_H
 #define VECTORS_H
+#include <vector>
+#include <iostream>
 
 // Минимальный набор векторных типов, нужный утилитам шаблона.
 // Остальную математику (операции над векторами, матрицы) вы пишете сами.
@@ -58,6 +60,34 @@ static inline vec3 make3(float x, float y, float z)
 
 
 float edge_func(const vec3 &v1, const vec3 &v2, const vec3 &p);
+
+
+
+struct Matrix {
+    std::vector<float> data;
+    int size;
+    int b = 0;
+
+    Matrix(int size);
+    ~Matrix() = default;
+
+    Matrix &inverse();
+
+
+};
+
+
+Matrix operator+(const Matrix &a, const Matrix &b);
+Matrix operator*(const Matrix &a, const Matrix &b);
+
+Matrix operator+(const Matrix &a, float b); 
+Matrix operator+(float a, const Matrix &b); 
+
+
+Matrix operator*(const Matrix &a, float b); 
+Matrix operator*(float a, const Matrix &b); 
+
+std::ostream& operator<<(std::ostream &os, const Matrix &a);
 
 
 #endif
