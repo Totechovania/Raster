@@ -11,6 +11,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "vectors.h"
+
 
 static void glfw_error_callback(int error, const char *description)
 {
@@ -100,15 +102,26 @@ int main(int argc, char **argv)
         float rgb[3];
         hue_to_rgb(hue, rgb);
         const uint8_t r = to_u8(rgb[0]), g = to_u8(rgb[1]), b = to_u8(rgb[2]);
+        */
 
         for (size_t i = 0; i < n_pixels; i++)
         {
-            pixels[4 * i + 0] = r;
-            pixels[4 * i + 1] = g;
-            pixels[4 * i + 2] = b;
+            pixels[4 * i + 0] = 0;
+            pixels[4 * i + 1] = 0;
+            pixels[4 * i + 2] = 0;
             pixels[4 * i + 3] = 255;
         }
-        */
+
+        vec3 v1(-1, -1);
+        vec3 v2{1, -1};
+        vec3 v3{0, 1};
+
+
+        auto scr2p = [fb_width, fb_height](int x, int y) {
+            return vec3(2.f * x / fb_width - 1, 2.f * y / fb_height - 1);
+        };
+
+        
 
         
 
