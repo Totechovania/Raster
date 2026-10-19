@@ -13,7 +13,7 @@ float edge_func(const vec3 &v1, const vec3 &v2, const vec3 &p)
  
 
 
-Matrix::Matrix(int size) {
+Matrix::Matrix(int size=4) {
     this->size = size;
     this->data.resize(size * size);
 

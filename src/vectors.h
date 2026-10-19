@@ -25,7 +25,6 @@ struct vec2
     
 };
 
-
 struct vec3
 {
     union
@@ -60,7 +59,6 @@ static inline vec3 make3(float x, float y, float z)
     return v;
 };
 
-
 float edge_func(const vec3 &v1, const vec3 &v2, const vec3 &p);
 
 
@@ -70,7 +68,7 @@ struct Matrix {
     int size;
     int b = 0;
 
-    explicit Matrix(int size);
+    explicit Matrix(int size=4);
     float &operator()(int i, int j);
     const float &operator()(int i, int j) const;
     Matrix &fill_zeros();
