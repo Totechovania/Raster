@@ -66,8 +66,7 @@ float edge_func(const vec3 &v1, const vec3 &v2, const vec3 &p);
 struct Matrix {
     std::vector<float> data;
     int size;
-    int b = 0;
-
+    
     explicit Matrix(int size=4);
     float &operator()(int i, int j);
     const float &operator()(int i, int j) const;

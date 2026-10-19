@@ -18,13 +18,6 @@
 #include <unistd.h>
 #endif
 
-void free_mesh(mesh *m)
-{
-    free(m->verts);
-    free(m->normals);
-    free(m->tcs);
-    free(m->indices);
-}
 
 static char* mmap_file(size_t* len, const char* filename) {
 #ifdef _WIN64
@@ -135,10 +128,6 @@ mesh load_obj(const char *filename)
     mesh m;
     m.num_triangles = 0;
     m.num_vertices = 0;
-    m.verts = NULL;
-    m.normals = NULL;
-    m.tcs = NULL;
-    m.indices = NULL;
 
     tinyobj_attrib_t attrib;
     tinyobj_shape_t *shapes = NULL;
@@ -167,10 +156,10 @@ mesh load_obj(const char *filename)
 
     if (valid)
     {
-        m.verts = (vec3 *)  malloc(num_corners * sizeof(vec3));
-        m.normals = has_normals ? (vec3 *)   malloc(num_corners * sizeof(vec3)) : NULL;
-        m.tcs =  has_tcs ? (vec2 *)  malloc(num_corners * sizeof(vec2)) : NULL;
-        m.indices = (int *) malloc(num_corners * sizeof(int));
+        m.verts.resize(num_corners);
+        if (has_normals) m.normals.resize(num_corners);
+        if (has_tcs) m.tcs.resize(num_corners);
+        m.indices.resize(num_corners);
         m.num_triangles = num_corners/3;
 
         uint32_t table_size = 1;
@@ -211,11 +200,9 @@ mesh load_obj(const char *filename)
 
         free(table);
 
-        m.verts = (vec3 *) realloc(m.verts, m.num_vertices * sizeof(vec3));
-        if (m.normals)
-            m.normals = (vec3 *)  realloc(m.normals, m.num_vertices * sizeof(vec3));
-        if (m.tcs)
-            m.tcs = (vec2 *) realloc(m.tcs, m.num_vertices * sizeof(vec2));
+        m.verts.resize(m.num_vertices);
+        if (has_normals) m.normals.resize(m.num_vertices);
+        if (has_tcs)     m.tcs.resize(m.num_vertices);
     }
     else
     {
