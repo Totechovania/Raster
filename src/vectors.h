@@ -3,6 +3,8 @@
 #include <vector>
 #include <iostream>
 
+
+
 // Минимальный набор векторных типов, нужный утилитам шаблона.
 // Остальную математику (операции над векторами, матрицы) вы пишете сами.
 
@@ -68,14 +70,26 @@ struct Matrix {
     int size;
     int b = 0;
 
-    Matrix(int size);
-    ~Matrix() = default;
+    explicit Matrix(int size);
+    float &operator()(int i, int j);
+    const float &operator()(int i, int j) const;
+    Matrix &fill_zeros();
+    Matrix &fill_identity();
 
-    Matrix &inverse();
+    Matrix(const Matrix&)=default;
+    Matrix& operator=(const Matrix&)=default;
+    Matrix(Matrix&&)=default;
+    Matrix& operator=(Matrix&&)=default;
+    ~Matrix()=default;
 
 
+
+    Matrix inverse() const;
+
+    Matrix &operator+=(const Matrix &b);
+    Matrix &operator+=(float b);
+    Matrix &operator*=(float b);
 };
-
 
 Matrix operator+(const Matrix &a, const Matrix &b);
 Matrix operator*(const Matrix &a, const Matrix &b);
@@ -85,7 +99,7 @@ Matrix operator+(float a, const Matrix &b);
 
 
 Matrix operator*(const Matrix &a, float b); 
-Matrix operator*(float a, const Matrix &b); 
+Matrix operator*(float a, const Matrix &b);
 
 std::ostream& operator<<(std::ostream &os, const Matrix &a);
 
