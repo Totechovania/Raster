@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(RasterTemplate CXX)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # По умолчанию собираем Release: программный растеризатор в Debug в разы медленнее
@@ -30,6 +30,7 @@ add_library(raster_utils STATIC
     src/image_utils.cpp
     src/mesh_utils.cpp
     src/vectors.cpp
+    src/scene_objects.cpp
 )
 target_include_directories(raster_utils PUBLIC src ${CMAKE_CURRENT_SOURCE_DIR})
 if(NOT MSVC)

@@ -24,16 +24,14 @@ int main(int argc, char **argv)
     if (m.num_triangles == 0)
     {
         printf("Failed to load mesh: %s\n", obj_path);
-        free_mesh(&m);
         return 1;
     }
 
     printf("Mesh %s\n", obj_path);
     printf("  vertices:   %d\n", m.num_vertices);
     printf("  triangles:  %d\n", m.num_triangles);
-    printf("  normals:    %s\n", m.normals ? "yes" : "no");
-    printf("  tex coords: %s\n", m.tcs ? "yes" : "no");
-    free_mesh(&m);
+    printf("  normals:    %s\n", m.normals.empty() ? "yes" : "no");
+    printf("  tex coords: %s\n", m.tcs.empty() ? "yes" : "no");
 
     int w = 0, h = 0;
     float *img = load_image_f32_rgb(tex_path, &w, &h, 1.0f);

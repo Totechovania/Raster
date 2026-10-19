@@ -188,11 +188,11 @@ mesh load_obj(const char *filename)
                 table[slot].vn_idx = vn_idx;
                 table[slot].id = id;
 
-                m.verts[id] = make3(attrib.vertices[3 * v_idx + 0], attrib.vertices[3 * v_idx + 1], attrib.vertices[3 * v_idx + 2]);
+                m.verts[id] = vec3(attrib.vertices[3 * v_idx + 0], attrib.vertices[3 * v_idx + 1], attrib.vertices[3 * v_idx + 2]);
                 if (has_normals)
-                    m.normals[id] = make3(attrib.normals[3 * vn_idx + 0], attrib.normals[3 * vn_idx + 1], attrib.normals[3 * vn_idx + 2]);
+                    m.normals[id] = vec3(attrib.normals[3 * vn_idx + 0], attrib.normals[3 * vn_idx + 1], attrib.normals[3 * vn_idx + 2]);
                 if (has_tcs)
-                    m.tcs[id] = make2(attrib.texcoords[2 * vt_idx + 0], attrib.texcoords[2 * vt_idx + 1]);
+                    m.tcs[id] = vec2(attrib.texcoords[2 * vt_idx + 0], attrib.texcoords[2 * vt_idx + 1]);
             }
 
             m.indices[i] = table[slot].id;
