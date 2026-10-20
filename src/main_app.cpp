@@ -83,8 +83,8 @@ int main(int argc, char **argv)
     const size_t n_pixels = (size_t)fb_width * fb_height;
     uint8_t *pixels = (uint8_t *) malloc(4 * n_pixels);
 
-    const float hue_speed = 0.2f; // оборотов цветового круга в секунду
-    float hue = 0.0f;
+    // const float hue_speed = 0.2f; // оборотов цветового круга в секунду
+    // float hue = 0.0f;
 
     double prev_time = glfwGetTime();
     double report_time = prev_time;
@@ -117,6 +117,8 @@ int main(int argc, char **argv)
         vec3 v2{1, 0};
         vec3 v3{0, 1};
 
+
+        vec3 test  = v1 + v2;
 
         
 

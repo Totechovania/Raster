@@ -10,67 +10,9 @@ float edge_func(const vec3 &v1, const vec3 &v2, const vec3 &p)
 };
 
 
-template< VectorLike V> 
-V operator+(const V &a, const V &b) {
-    V res;
-
-    for (int i = 0; i < V::dim; i++) {
-        res[i] = a[i] + b[i];
-    }
-
-    return res;
-};
-
-template< VectorLike V> 
-V operator+(const V &a, float b){
-    V res;
-
-    for (int i = 0; i < V::dim; i++) {
-        res[i] = a[i] + b;
-    }
-
-    return res;
-};
-template< VectorLike V> 
-V operator+(float a, const V &b){
-    return b + a;
-};
-
-template< VectorLike V> 
-V operator*(const V &a, float b){
-    V res;
-
-
-    for (int i = 0; i < V::dim; i++) {
-        res[i] = a[i] * b;
-    }
-
-    return res;
-};
-template< VectorLike V> 
-V operator*(float a, const V &b){
-    return b * a;
-};
-
-
-
-template< VectorLike V> 
-float dot(const V & a, const V &b) {
-    float res = 0;
-
-    for (int i = 0; i < V::dim; i++) {
-        res += a[i] * b[i];
-    }
-
-    return res;
-}
-
-
 vec3 cross(const vec3 & a, const vec3 &b) {
     return vec3(a.y * b.z - a.z * b.y, - a.x * b.z + a.z * b.x, a.x * b.y - a.y * b.x);
 };
-
-
 
 
 Matrix::Matrix(int size) {

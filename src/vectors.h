@@ -86,7 +86,7 @@ struct vec3: vec_base<vec3, 3>
 
 };
 
-struct vec4: vec_base<vec3, 3>
+struct vec4: vec_base<vec4, 4>
 {
 
     union
@@ -107,23 +107,63 @@ struct vec4: vec_base<vec3, 3>
 
 
 
-template< VectorLike V> 
-V operator+(const V &a, const V &b);
 
 template< VectorLike V> 
-V operator+(const V &a, float b);
-template< VectorLike V> 
-V operator+(float a, const V &b);
+inline V operator+(const V &a, const V &b) {
+    V res;
+
+    for (int i = 0; i < V::dim; i++) {
+        res[i] = a[i] + b[i];
+    }
+
+    return res;
+};
 
 template< VectorLike V> 
-V operator*(const V &a, float b);
+inline V operator+(const V &a, float b){
+    V res;
+
+    for (int i = 0; i < V::dim; i++) {
+        res[i] = a[i] + b;
+    }
+
+    return res;
+};
+
 template< VectorLike V> 
-V operator*(float a, const V &b);
+inline V operator+(float a, const V &b){
+    return b + a;
+};
+
+template< VectorLike V> 
+inline V operator*(const V &a, float b){
+    V res;
+
+
+    for (int i = 0; i < V::dim; i++) {
+        res[i] = a[i] * b;
+    }
+
+    return res;
+};
+template< VectorLike V> 
+inline V operator*(float a, const V &b){
+    return b * a;
+};
 
 
 
 template< VectorLike V> 
-float dot(const V & a, const V &b);
+inline float dot(const V & a, const V &b) {
+    float res = 0;
+
+    for (int i = 0; i < V::dim; i++) {
+        res += a[i] * b[i];
+    }
+
+    return res;
+}
+
 vec3 cross(const vec3 & a, const vec3 &b);
 
 
@@ -152,8 +192,6 @@ struct Matrix {
     Matrix(Matrix&&)=default;
     Matrix& operator=(Matrix&&)=default;
     ~Matrix()=default;
-
-
 
     Matrix inverse() const;
 
