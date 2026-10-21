@@ -2,7 +2,8 @@
 #define VECTORS_H
 #include <vector>
 #include <iostream>
-
+#include <stdexcept>
+#include <math.h>
 
 
 // Минимальный набор векторных типов, нужный утилитам шаблона.
@@ -40,6 +41,18 @@ struct vec_base {
 
         return dot(self(), self());
     }
+
+    Derived& norm() {
+        float l = self().len();
+        if (std::abs(l) < 1e-10) {
+            throw std::range_error("trying to normolise zero len vector");
+        } 
+
+        self() *= 1/l;
+
+        return self();
+    }
+    
 
     Derived& operator+=(const Derived& other) {
         static_assert(VectorLike<Derived>);
@@ -106,8 +119,6 @@ struct vec4: vec_base<vec4, 4>
 
 
 
-
-
 template< VectorLike V> 
 inline V operator+(const V &a, const V &b) {
     V res;
@@ -146,6 +157,7 @@ inline V operator*(const V &a, float b){
 
     return res;
 };
+
 template< VectorLike V> 
 inline V operator*(float a, const V &b){
     return b * a;
@@ -166,8 +178,7 @@ inline float dot(const V & a, const V &b) {
 
 vec3 cross(const vec3 & a, const vec3 &b);
 
-
-
+vec4 operator*(const Matrix4 &m, const vec4 &v);
 
 
 
@@ -181,7 +192,10 @@ struct Matrix4 {
     static constexpr int size = 4;
     float data[size * size];
 
-    explicit Matrix4() {};
+    Matrix4() {};
+
+    Matrix4(const Matrix3 m3);
+
     float &operator()(int i, int j);
     const float &operator()(int i, int j) const;
     Matrix4 &fill_zeros();
@@ -260,5 +274,18 @@ Matrix3 transpose(const Matrix3 &a);
 Matrix3 inverse(const Matrix3 &a);
 
 std::ostream &operator<<(std::ostream &os, const Matrix3 &a);
+
+
+
+Matrix3 scale_matrix(const vec3 &s_v);
+
+Matrix3 rotation_matrix(const vec3 &s_v);
+
+Matrix3 rotation_x_matrix(float x_angle);
+Matrix3 rotation_y_matrix(float y_angle);
+Matrix3 rotation_z_matrix(float z_angle);
+
+Matrix4 translate_matrix(const vec3 &s_v);
+
 
 #endif

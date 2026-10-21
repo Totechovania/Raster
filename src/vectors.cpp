@@ -1,5 +1,5 @@
 #include "vectors.h"
-#include <stdexcept>
+
 
 
 
@@ -12,11 +12,41 @@ float edge_func(const vec3 &v1, const vec3 &v2, const vec3 &p)
 
 vec3 cross(const vec3 & a, const vec3 &b) {
     return vec3(a.y * b.z - a.z * b.y, - a.x * b.z + a.z * b.x, a.x * b.y - a.y * b.x);
+}
+
+vec4 operator*(const Matrix4 &m, const vec4 &v) {
+    vec4 res;
+
+    for (int i = 0; i < 4; i++) {
+        res[i] = 0;
+        for (int j = 0; j < m.size; j++) {
+            res[i] += m(j, i) * v[i];
+        }
+    }
+
+    return res;
 };
 
+Matrix4::Matrix4(const Matrix3 m3) {
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            (*this)(i, j) = m3(i, j);
+        }
+    }
 
+    for (int j = 0; j < 3; j++) {
+            (*this)(3, j) = 0;
+    }
 
-float &Matrix4::operator()(int i, int j){
+    for (int i = 0; i < 3; i++) {
+            (*this)(i, 3) = 0;
+    }
+
+    (*this)(3, 3) = 1;
+}
+
+float &Matrix4::operator()(int i, int j)
+{
     if (i < 0 || i >= this->size || j < 0 || j >= this->size) {
         throw std::out_of_range("Matrix4 index out of range");
     }
@@ -610,9 +640,69 @@ std::ostream& operator<<(std::ostream &os, const Matrix3 &a) {
     return os;
 }
 
-
-
-
+Matrix3 scale_matrix(const vec3 &s_v) {
+    Matrix3 res;
+    res.fill_zeros();
     
+    for (int i = 0; i < 3; i++) {
+        res(i, i) = s_v[i];
+    }
 
+    return res;
+}
+
+
+
+Matrix3 rotation_x_matrix(float x_angle) {
+    Matrix3 res;
+    res.fill_identity();
     
+    res(1, 1) = std::cos(x_angle);
+    res(2, 2) = std::cos(x_angle);
+    res(1, 2) = -std::sin(x_angle);
+    res(2, 1) = std::sin(x_angle);
+
+
+    return res;
+}
+
+Matrix3 rotation_y_matrix(float y_angle){
+    Matrix3 res;
+    res.fill_identity();
+    
+    res(0, 0) = std::cos(y_angle);
+    res(2, 2) = std::cos(y_angle);
+    res(2, 0) = -std::sin(y_angle);
+    res(0, 2) = std::sin(y_angle);
+
+
+    return res;
+}
+
+Matrix3 rotation_z_matrix(float z_angle){
+    Matrix3 res;
+    res.fill_identity();
+    
+    res(0, 0) = std::cos(z_angle);
+    res(1, 1) = std::cos(z_angle);
+    res(0, 1) = -std::sin(z_angle);
+    res(1, 0) = std::sin(z_angle);
+
+
+    return res;
+}
+
+Matrix3 rotation_matrix(const vec3 &s_v) {
+    return rotation_z_matrix(s_v.z) * rotation_y_matrix(s_v.y) * rotation_x_matrix(s_v.x);
+}
+
+Matrix4 translate_matrix(const vec3 &s_v) {
+    Matrix4 res;
+    res.fill_identity();
+    
+    for (int i = 0; i < 3; i++) {
+        res(i, 3) = s_v[i];
+    }
+
+    return res;
+}
