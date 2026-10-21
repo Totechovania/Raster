@@ -63,7 +63,22 @@ struct vec_base {
 
         return self();
     }
+
+    Derived& operator*=(float a) {
+        static_assert(VectorLike<Derived>);
+
+        for (int i=0; i < N; i++) {
+            self()[i] *= a;
+        }
+
+        return self();
+    }
+
+    
 };
+
+
+
 
 struct vec2: vec_base<vec2, 2>
 {
@@ -115,6 +130,14 @@ struct vec4: vec_base<vec4, 4>
     };
 
     vec4(float x_v=0, float y_v=0, float z_v=0, float w_v=0): x(x_v), y(y_v), z(z_v), w(w_v) {};
+
+    vec4(const vec3 &v) {
+        for (int i = 0; i < 3; i++) {
+            M[i] = v[i];
+        }
+
+        M[3] = 1;
+    }
 };
 
 
@@ -125,6 +148,42 @@ inline V operator+(const V &a, const V &b) {
 
     for (int i = 0; i < V::dim; i++) {
         res[i] = a[i] + b[i];
+    }
+
+    return res;
+};
+
+template< VectorLike V>
+std::ostream &operator<<(std::ostream &os, const V &a) {
+    os << "[ ";
+    
+    for (int i = 0; i < V::dim; i++) {
+        os << a[i] << " ";
+    }
+
+    os << " ]\n";
+    
+    return os;
+}
+
+
+template< VectorLike V> 
+inline V operator-(const V &a, const V &b) {
+    V res;
+
+    for (int i = 0; i < V::dim; i++) {
+        res[i] = a[i] - b[i];
+    }
+
+    return res;
+};
+
+template< VectorLike V> 
+inline V operator-(const V &b) {
+    V res;
+
+    for (int i = 0; i < V::dim; i++) {
+        res[i] = -b[i];
     }
 
     return res;
@@ -162,6 +221,7 @@ template< VectorLike V>
 inline V operator*(float a, const V &b){
     return b * a;
 };
+
 
 
 
