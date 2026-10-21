@@ -213,7 +213,7 @@ Matrix4 operator+(float a, const Matrix4 &b);
 Matrix4 operator*(const Matrix4 &a, float b); 
 Matrix4 operator*(float a, const Matrix4 &b);
 
-Matrix4 &transpose(const Matrix4 &a);
+Matrix4 transpose(const Matrix4 &a);
 
 std::ostream &operator<<(std::ostream &os, const Matrix4 &a);
 
@@ -255,7 +255,7 @@ Matrix3 operator+(float a, const Matrix3 &b);
 Matrix3 operator*(const Matrix3 &a, float b); 
 Matrix3 operator*(float a, const Matrix3 &b);
 
-Matrix3 &transpose(const Matrix3 &a);
+Matrix3 transpose(const Matrix3 &a);
 
 Matrix3 inverse(const Matrix3 &a);
 

@@ -283,9 +283,10 @@ Matrix4 &Matrix4::transpose() {
         }
     }
 
+    return *this;
 }
 
-Matrix4 &transpose(const Matrix4 &a){
+Matrix4 transpose(const Matrix4 &a){
     Matrix4 res = a;
     for (int i = 0; i < a.size; i++) {       
         for (int j = 0; j < a.size; j++) {
@@ -293,6 +294,7 @@ Matrix4 &transpose(const Matrix4 &a){
         }
     }
 
+    return res;
 }
 
 
@@ -487,15 +489,19 @@ Matrix3 &Matrix3::transpose() {
         }
     }
 
+    return *this;
 }
 
-Matrix3 &transpose(const Matrix3 &a){
+Matrix3 transpose(const Matrix3 &a){
     Matrix3 res = a;
     for (int i = 0; i < a.size; i++) {       
         for (int j = 0; j < a.size; j++) {
                 swap(res(i, j), res(j, i));
         }
     }
+
+
+    return res;
 }
 
 
