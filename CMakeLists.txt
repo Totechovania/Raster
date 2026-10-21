@@ -24,7 +24,7 @@ else()
         add_compile_options(/wd4505 /wd5045 /wd4820 /wd4242 /wd4244 /wd4996 /wd4668 /wd4100 /O2)
     else()
         add_compile_options(-Wall -Wno-unused-function -O3 -march=native -flto)
-        add_link_options(-pg -flto)
+        add_link_options(-flto=auto)
     endif()
 endif()
 
@@ -36,6 +36,7 @@ add_library(raster_utils STATIC
     src/mesh_utils.cpp
     src/vectors.cpp
     src/scene_objects.cpp
+    src/Renderer.cpp
 )
 target_include_directories(raster_utils PUBLIC src ${CMAKE_CURRENT_SOURCE_DIR})
 if(NOT MSVC)

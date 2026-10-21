@@ -187,18 +187,21 @@ struct Matrix4 {
     Matrix4 &fill_zeros();
     Matrix4 &fill_identity();
 
+    Matrix4 inverse();
+
     Matrix4(const Matrix4&)=default;
     Matrix4& operator=(const Matrix4&)=default;
     Matrix4(Matrix4&&)=default;
     Matrix4& operator=(Matrix4&&)=default;
     ~Matrix4()=default;
 
-    Matrix4 inverse() const;
-
     Matrix4 &operator+=(const Matrix4 &b);
     Matrix4 &operator+=(float b);
     Matrix4 &operator*=(float b);
+    Matrix4 &transpose();
 };
+
+Matrix4 inverse(const Matrix4 &a);
 
 Matrix4 operator+(const Matrix4 &a, const Matrix4 &b);
 Matrix4 operator*(const Matrix4 &a, const Matrix4 &b);
@@ -210,7 +213,10 @@ Matrix4 operator+(float a, const Matrix4 &b);
 Matrix4 operator*(const Matrix4 &a, float b); 
 Matrix4 operator*(float a, const Matrix4 &b);
 
-std::ostream& operator<<(std::ostream &os, const Matrix4 &a);
+Matrix4 &transpose(const Matrix4 &a);
+
+std::ostream &operator<<(std::ostream &os, const Matrix4 &a);
+
 
 
 
@@ -232,11 +238,11 @@ struct Matrix3 {
     Matrix3& operator=(Matrix3&&)=default;
     ~Matrix3()=default;
 
-    Matrix3 inverse() const;
-
     Matrix3 &operator+=(const Matrix3 &b);
     Matrix3 &operator+=(float b);
     Matrix3 &operator*=(float b);
+    Matrix3 &transpose();
+    Matrix3 &inverse();
 };
 
 Matrix3 operator+(const Matrix3 &a, const Matrix3 &b);
@@ -249,7 +255,10 @@ Matrix3 operator+(float a, const Matrix3 &b);
 Matrix3 operator*(const Matrix3 &a, float b); 
 Matrix3 operator*(float a, const Matrix3 &b);
 
-std::ostream& operator<<(std::ostream &os, const Matrix3 &a);
+Matrix3 &transpose(const Matrix3 &a);
 
+Matrix3 inverse(const Matrix3 &a);
+
+std::ostream &operator<<(std::ostream &os, const Matrix3 &a);
 
 #endif

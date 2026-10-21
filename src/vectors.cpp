@@ -59,6 +59,8 @@ Matrix4 &Matrix4::fill_identity() {
 
 
 
+
+
 void swap(float &a, float &b) {
     float t = a;
     a = b;
@@ -88,9 +90,52 @@ diff_raws(Matrix4 &m, int j, int i, float i_coef) {
 }
 
 
-Matrix4 Matrix4::inverse() const{
+Matrix4 Matrix4::inverse() {
 
-    Matrix4 tmp = *this;
+    Matrix4 res = Matrix4();
+    res.fill_identity();
+
+    for(int col = 0; col < (*this).size; col++) {
+        int row = col;
+        float max_v = std::abs((*this)(col, col));
+        for (int i = col + 1; i < this->size; ++i) {
+            float v = std::abs((*this)(i, col));
+            if (v > max_v) {
+                max_v = v;
+                row = i;
+            }
+        }
+
+
+        if (max_v < 1e-10) {
+            throw std::logic_error("Matrix4 dont have an inverse");
+        }
+
+        if (row != col) {
+            swap_raws(*this, row, col);
+            swap_raws(res, row, col);
+        }
+        
+        mlt_raw(res, col,  1.f / (*this)(col, col));
+        mlt_raw((*this), col,  1.f / (*this)(col, col));
+
+        for (int i = 0; i < (*this).size; i++) {
+            if (i == col) continue;
+            diff_raws(res, i, col, (*this)(i, col));
+            diff_raws((*this), i, col, (*this)(i, col));
+        }
+
+    }
+
+    (*this) = res;
+
+    return (*this);
+};
+
+
+Matrix4 inverse(const Matrix4& a) {
+
+    Matrix4 tmp = a;
 
     Matrix4 res = Matrix4();
     res.fill_identity();
@@ -129,6 +174,8 @@ Matrix4 Matrix4::inverse() const{
 
     return res;
 };
+
+
 
 
 Matrix4 operator+(const Matrix4 &a, const Matrix4 &b) {
@@ -229,6 +276,26 @@ Matrix4 &Matrix4::operator*=(float b)
     return *this;
 }
 
+Matrix4 &Matrix4::transpose() {
+    for (int i = 0; i < this->size; i++) {       
+        for (int j = 0; j < this->size; j++) {
+                swap((*this)(i, j), (*this)(j, i));
+        }
+    }
+
+}
+
+Matrix4 &transpose(const Matrix4 &a){
+    Matrix4 res = a;
+    for (int i = 0; i < a.size; i++) {       
+        for (int j = 0; j < a.size; j++) {
+                swap(res(i, j), res(j, i));
+        }
+    }
+
+}
+
+
 std::ostream& operator<<(std::ostream &os, const Matrix4 &a) {                                                     
     os << "[\n";
     for (int i = 0; i < a.size; i++) {    
@@ -314,50 +381,6 @@ diff_raws(Matrix3 &m, int j, int i, float i_coef) {
     }
 
 }
-
-
-Matrix3 Matrix3::inverse() const{
-
-    Matrix3 tmp = *this;
-
-    Matrix3 res = Matrix3();
-    res.fill_identity();
-
-    for(int col = 0; col < tmp.size; col++) {
-        int row = col;
-        float max_v = std::abs(tmp(col, col));
-        for (int i = col + 1; i < tmp.size; ++i) {
-            float v = std::abs(tmp(i, col));
-            if (v > max_v) {
-                max_v = v;
-                row = i;
-            }
-        }
-
-
-        if (max_v < 1e-10) {
-            throw std::logic_error("Matrix3 dont have an inverse");
-        }
-
-        if (row != col) {
-            swap_raws(tmp, row, col);
-            swap_raws(res, row, col);
-        }
-        
-        mlt_raw(res, col,  1.f / tmp(col, col));
-        mlt_raw(tmp, col,  1.f / tmp(col, col));
-
-        for (int i = 0; i < tmp.size; i++) {
-            if (i == col) continue;
-            diff_raws(res, i, col, tmp(i, col));
-            diff_raws(tmp, i, col, tmp(i, col));
-        }
-
-    }
-
-    return res;
-};
-
 
 Matrix3 operator+(const Matrix3 &a, const Matrix3 &b) {
 
@@ -456,6 +479,115 @@ Matrix3 &Matrix3::operator*=(float b)
 
     return *this;
 }
+
+Matrix3 &Matrix3::transpose() {
+    for (int i = 0; i < this->size; i++) {       
+        for (int j = 0; j < this->size; j++) {
+                swap((*this)(i, j), (*this)(j, i));
+        }
+    }
+
+}
+
+Matrix3 &transpose(const Matrix3 &a){
+    Matrix3 res = a;
+    for (int i = 0; i < a.size; i++) {       
+        for (int j = 0; j < a.size; j++) {
+                swap(res(i, j), res(j, i));
+        }
+    }
+}
+
+
+
+Matrix3 &Matrix3::inverse() {
+
+    Matrix3 res = Matrix3();
+    res.fill_identity();
+
+    for(int col = 0; col < (*this).size; col++) {
+        int row = col;
+        float max_v = std::abs((*this)(col, col));
+        for (int i = col + 1; i < this->size; ++i) {
+            float v = std::abs((*this)(i, col));
+            if (v > max_v) {
+                max_v = v;
+                row = i;
+            }
+        }
+
+
+        if (max_v < 1e-10) {
+            throw std::logic_error("Matrix4 dont have an inverse");
+        }
+
+        if (row != col) {
+            swap_raws(*this, row, col);
+            swap_raws(res, row, col);
+        }
+        
+        mlt_raw(res, col,  1.f / (*this)(col, col));
+        mlt_raw((*this), col,  1.f / (*this)(col, col));
+
+        for (int i = 0; i < (*this).size; i++) {
+            if (i == col) continue;
+            diff_raws(res, i, col, (*this)(i, col));
+            diff_raws((*this), i, col, (*this)(i, col));
+        }
+
+    }
+
+    (*this) = res;
+
+    return (*this);
+};
+
+
+Matrix3 inverse(const Matrix3& a) {
+
+    Matrix3 tmp = a;
+
+    Matrix3 res = Matrix3();
+    res.fill_identity();
+
+    for(int col = 0; col < tmp.size; col++) {
+        int row = col;
+        float max_v = std::abs(tmp(col, col));
+        for (int i = col + 1; i < tmp.size; ++i) {
+            float v = std::abs(tmp(i, col));
+            if (v > max_v) {
+                max_v = v;
+                row = i;
+            }
+        }
+
+
+        if (max_v < 1e-10) {
+            throw std::logic_error("Matrix4 dont have an inverse");
+        }
+
+        if (row != col) {
+            swap_raws(tmp, row, col);
+            swap_raws(res, row, col);
+        }
+        
+        mlt_raw(res, col,  1.f / tmp(col, col));
+        mlt_raw(tmp, col,  1.f / tmp(col, col));
+
+        for (int i = 0; i < tmp.size; i++) {
+            if (i == col) continue;
+            diff_raws(res, i, col, tmp(i, col));
+            diff_raws(tmp, i, col, tmp(i, col));
+        }
+
+    }
+
+    return res;
+};
+
+
+
+
 
 std::ostream& operator<<(std::ostream &os, const Matrix3 &a) {                                                     
     os << "[\n";
