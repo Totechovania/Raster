@@ -19,6 +19,5 @@ struct Renderer{
     void
     render_scene(Camera &cam);
 
-
-
+    
 };
