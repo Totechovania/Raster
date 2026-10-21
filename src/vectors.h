@@ -178,59 +178,12 @@ inline float dot(const V & a, const V &b) {
 
 vec3 cross(const vec3 & a, const vec3 &b);
 
-vec4 operator*(const Matrix4 &m, const vec4 &v);
 
 
 
 
 
 float edge_func(const vec3 &v1, const vec3 &v2, const vec3 &p);
-
-
-
-struct Matrix4 {
-    static constexpr int size = 4;
-    float data[size * size];
-
-    Matrix4() {};
-
-    Matrix4(const Matrix3 m3);
-
-    float &operator()(int i, int j);
-    const float &operator()(int i, int j) const;
-    Matrix4 &fill_zeros();
-    Matrix4 &fill_identity();
-
-    Matrix4 inverse();
-
-    Matrix4(const Matrix4&)=default;
-    Matrix4& operator=(const Matrix4&)=default;
-    Matrix4(Matrix4&&)=default;
-    Matrix4& operator=(Matrix4&&)=default;
-    ~Matrix4()=default;
-
-    Matrix4 &operator+=(const Matrix4 &b);
-    Matrix4 &operator+=(float b);
-    Matrix4 &operator*=(float b);
-    Matrix4 &transpose();
-};
-
-Matrix4 inverse(const Matrix4 &a);
-
-Matrix4 operator+(const Matrix4 &a, const Matrix4 &b);
-Matrix4 operator*(const Matrix4 &a, const Matrix4 &b);
-
-Matrix4 operator+(const Matrix4 &a, float b); 
-Matrix4 operator+(float a, const Matrix4 &b); 
-
-
-Matrix4 operator*(const Matrix4 &a, float b); 
-Matrix4 operator*(float a, const Matrix4 &b);
-
-Matrix4 transpose(const Matrix4 &a);
-
-std::ostream &operator<<(std::ostream &os, const Matrix4 &a);
-
 
 
 
@@ -281,11 +234,61 @@ Matrix3 scale_matrix(const vec3 &s_v);
 
 Matrix3 rotation_matrix(const vec3 &s_v);
 
+
+struct Matrix4 {
+    static constexpr int size = 4;
+    float data[size * size];
+
+    Matrix4() {};
+
+    Matrix4(const Matrix3 m3);
+
+    float &operator()(int i, int j);
+    const float &operator()(int i, int j) const;
+    Matrix4 &fill_zeros();
+    Matrix4 &fill_identity();
+
+    Matrix4 inverse();
+
+    Matrix4(const Matrix4&)=default;
+    Matrix4& operator=(const Matrix4&)=default;
+    Matrix4(Matrix4&&)=default;
+    Matrix4& operator=(Matrix4&&)=default;
+    ~Matrix4()=default;
+
+    Matrix4 &operator+=(const Matrix4 &b);
+    Matrix4 &operator+=(float b);
+    Matrix4 &operator*=(float b);
+    Matrix4 &transpose();
+};
+
+Matrix4 inverse(const Matrix4 &a);
+
+Matrix4 operator+(const Matrix4 &a, const Matrix4 &b);
+Matrix4 operator*(const Matrix4 &a, const Matrix4 &b);
+
+Matrix4 operator+(const Matrix4 &a, float b); 
+Matrix4 operator+(float a, const Matrix4 &b); 
+
+
+Matrix4 operator*(const Matrix4 &a, float b); 
+Matrix4 operator*(float a, const Matrix4 &b);
+
+Matrix4 transpose(const Matrix4 &a);
+
+std::ostream &operator<<(std::ostream &os, const Matrix4 &a);
+
+
+
+
 Matrix3 rotation_x_matrix(float x_angle);
 Matrix3 rotation_y_matrix(float y_angle);
 Matrix3 rotation_z_matrix(float z_angle);
 
 Matrix4 translate_matrix(const vec3 &s_v);
 
+
+
+vec4 operator*(const Matrix4 &m, const vec4 &v);
 
 #endif
