@@ -5,6 +5,7 @@ Renderer::Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height)
     : pixels(pixels), fb_width(fb_width), fb_height(fb_height)
 {
     this->depth_buf.resize((size_t)fb_width * fb_height);
+    this->update_P_pers();
 }
 
 void Renderer::render_scene(Camera &cam) {
@@ -67,5 +68,18 @@ void Renderer::render_scene(Camera &cam) {
 
 
 
-};
+}
 
+void Renderer::update_P_pers(float fov, float a, float n, float f) {
+    float c = 1 / std::tan(fov /2);
+    this->P.fill_identity();
+
+    this->P(0, 0) = c / a;
+    this->P(1, 1) = c;
+    this->P(2, 2) = (f + n) / (n - f);
+    this->P(3, 3) = 0;
+
+    this->P(2, 3) = (2 * f * n) / (n - f);
+    this->P(3, 2) = -1;
+
+};
