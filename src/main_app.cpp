@@ -90,6 +90,8 @@ int main(int argc, char **argv)
     double report_time = prev_time;
     int report_frames = 0;
 
+
+
     while (!glfwWindowShouldClose(window))
     {
         const double now = glfwGetTime();

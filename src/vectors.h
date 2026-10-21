@@ -177,40 +177,79 @@ float edge_func(const vec3 &v1, const vec3 &v2, const vec3 &p);
 
 
 
-struct Matrix {
-    std::vector<float> data;
-    int size;
+struct Matrix4 {
+    static constexpr int size = 4;
+    float data[size * size];
 
-    explicit Matrix(int size=4);
+    explicit Matrix4() {};
     float &operator()(int i, int j);
     const float &operator()(int i, int j) const;
-    Matrix &fill_zeros();
-    Matrix &fill_identity();
+    Matrix4 &fill_zeros();
+    Matrix4 &fill_identity();
 
-    Matrix(const Matrix&)=default;
-    Matrix& operator=(const Matrix&)=default;
-    Matrix(Matrix&&)=default;
-    Matrix& operator=(Matrix&&)=default;
-    ~Matrix()=default;
+    Matrix4(const Matrix4&)=default;
+    Matrix4& operator=(const Matrix4&)=default;
+    Matrix4(Matrix4&&)=default;
+    Matrix4& operator=(Matrix4&&)=default;
+    ~Matrix4()=default;
 
-    Matrix inverse() const;
+    Matrix4 inverse() const;
 
-    Matrix &operator+=(const Matrix &b);
-    Matrix &operator+=(float b);
-    Matrix &operator*=(float b);
+    Matrix4 &operator+=(const Matrix4 &b);
+    Matrix4 &operator+=(float b);
+    Matrix4 &operator*=(float b);
 };
 
-Matrix operator+(const Matrix &a, const Matrix &b);
-Matrix operator*(const Matrix &a, const Matrix &b);
+Matrix4 operator+(const Matrix4 &a, const Matrix4 &b);
+Matrix4 operator*(const Matrix4 &a, const Matrix4 &b);
 
-Matrix operator+(const Matrix &a, float b); 
-Matrix operator+(float a, const Matrix &b); 
+Matrix4 operator+(const Matrix4 &a, float b); 
+Matrix4 operator+(float a, const Matrix4 &b); 
 
 
-Matrix operator*(const Matrix &a, float b); 
-Matrix operator*(float a, const Matrix &b);
+Matrix4 operator*(const Matrix4 &a, float b); 
+Matrix4 operator*(float a, const Matrix4 &b);
 
-std::ostream& operator<<(std::ostream &os, const Matrix &a);
+std::ostream& operator<<(std::ostream &os, const Matrix4 &a);
+
+
+
+
+
+struct Matrix3 {
+    static constexpr int size = 3;
+    float data[size * size];
+
+    explicit Matrix3() {};
+    float &operator()(int i, int j);
+    const float &operator()(int i, int j) const;
+    Matrix3 &fill_zeros();
+    Matrix3 &fill_identity();
+
+    Matrix3(const Matrix3&)=default;
+    Matrix3& operator=(const Matrix3&)=default;
+    Matrix3(Matrix3&&)=default;
+    Matrix3& operator=(Matrix3&&)=default;
+    ~Matrix3()=default;
+
+    Matrix3 inverse() const;
+
+    Matrix3 &operator+=(const Matrix3 &b);
+    Matrix3 &operator+=(float b);
+    Matrix3 &operator*=(float b);
+};
+
+Matrix3 operator+(const Matrix3 &a, const Matrix3 &b);
+Matrix3 operator*(const Matrix3 &a, const Matrix3 &b);
+
+Matrix3 operator+(const Matrix3 &a, float b); 
+Matrix3 operator+(float a, const Matrix3 &b); 
+
+
+Matrix3 operator*(const Matrix3 &a, float b); 
+Matrix3 operator*(float a, const Matrix3 &b);
+
+std::ostream& operator<<(std::ostream &os, const Matrix3 &a);
 
 
 #endif
