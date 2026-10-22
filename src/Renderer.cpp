@@ -6,7 +6,7 @@
 Renderer::Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, int vert_buf_size)
     : pixels(pixels), fb_width(fb_width), fb_height(fb_height), cam()
 {
-    cam.look_at(vec3(0, 0, 1),
+    cam.look_at(vec3(0, 0, 2),
         vec3(0, 0, 0), 
         vec3(0, 1, 0));
 
@@ -38,20 +38,21 @@ void Renderer::render_scene(std::vector<Model> &models) {
 
     Matrix4 VP = this->P * this->cam.V;
 
-    
-    
-    int tri[3]{0, 1, 2};
-
     auto p2scr = [this](vec3 p) {
-        return vec3((p.x + 1) * 0.5 * fb_width, (p.y + 1) * 0.5 * fb_height, p.z);
+        return vec3((p.x + 1) * 0.5 * (fb_width-1), (p.y + 1) * 0.5 * (fb_height-1), p.z);
     };
 
 
     for (const Model &model: models) {
         Matrix4 MVP = VP * model.M;
-
+        
         for (int i = 0; i < model.mesh.num_vertices; i++) {
-            vec4 tmp = MVP * model.mesh.verts[i];
+            vec4 v4(model.mesh.verts[i].x,
+                    model.mesh.verts[i].y,
+                    model.mesh.verts[i].z,
+                    1.0f
+            );
+            vec4 tmp = MVP * v4;
             vert_buf[i].co = vec3(tmp.x, tmp.y, tmp.z);
             vert_buf[i].w = tmp.w;
         }
@@ -72,7 +73,10 @@ void Renderer::render_scene(std::vector<Model> &models) {
                 
             for (int k = 0; k < 3; k++) {
                 c[k].co = p2scr(c[k].co * (1 / c[k].w));
+               
             }
+ 
+
 
             rasterize_triangle(c);
         }
@@ -93,8 +97,8 @@ void inline Renderer::rasterize_triangle(Vertex *c) {
         p_x_max = std::ceil(std::max(std::max(v1.co.x, v2.co.x), v3.co.x));
         p_y_max = std::ceil(std::max(std::max(v1.co.y, v2.co.y), v3.co.y));
 
-        p_x_min = std::ceil(std::min(std::min(v1.co.y, v2.co.y), v3.co.y));
-        p_y_min = std::ceil(std::min(std::min(v1.co.y, v2.co.y), v3.co.y));
+        p_x_min = std::floor(std::min(std::min(v1.co.x, v2.co.x), v3.co.x));
+        p_y_min = std::floor(std::min(std::min(v1.co.y, v2.co.y), v3.co.y));
 
         if (p_x_max >= fb_width) p_x_max = fb_width - 1;
         if (p_x_min < 0) p_x_min = 0;
@@ -117,10 +121,15 @@ void inline Renderer::rasterize_triangle(Vertex *c) {
                         
 
                     int i = row * fb_width + col;
-                    pixels[4 * i + 0] = 255 * e1;
-                    pixels[4 * i + 1] = 255 * e2;
-                    pixels[4 * i + 2] = 255 * e3;
-                    pixels[4 * i + 3] = 255;
+                    float depth = c[0].co.z * e1 + c[1].co.z * e2 +  c[2].co.z * e3;
+                    if (depth < this->depth_buf[i]) {
+                        this->depth_buf[i] = depth;
+
+                        pixels[4 * i + 0] = 255 * e1;
+                        pixels[4 * i + 1] = 255 * e2;
+                        pixels[4 * i + 2] = 255 * e3;
+                        pixels[4 * i + 3] = 255;
+                    }
 
                 }
 

@@ -91,10 +91,10 @@ int main(int argc, char **argv)
     std::vector<Model> models;
 
     
-    Mesh m = load_obj("resources/test1.obj");
+    Mesh m = load_obj("resources/Bunny.obj").norm();
     models.push_back(Model(m));
 
-    Renderer renderer = Renderer(pixels, fb_width, fb_height, 3);
+    Renderer renderer = Renderer(pixels, fb_width, fb_height, m.num_vertices);
 
 
     // const float hue_speed = 0.2f; // оборотов цветового круга в секунду

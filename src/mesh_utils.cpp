@@ -214,3 +214,40 @@ Mesh load_obj(const char *filename)
     tinyobj_materials_free(materials, num_materials);
     return m;
 }
+
+Mesh &Mesh::norm() {
+    vec3 max{};
+    vec3 min{};
+
+    for (auto vert: this->verts) {
+        for (int i = 0; i < 3; i++) {
+            max[i] = std::max(max[i], vert[i]);
+        }
+
+        for (int i = 0; i < 3; i++) {
+            min[i] = std::min(min[i], vert[i]);
+        }
+    }
+
+    vec3 translate = (max + min) * 0.5;
+
+    for (int i = 0; i < this->num_vertices; i++) {
+            this->verts[i] += -translate;
+    }
+
+    vec3 scale = (max - min) * 0.5;
+    
+    float max_s = 0;
+
+    for (int i = 0; i < 3; i++) {
+        max_s = std::max(max_s, scale[i]);
+    }
+
+    max_s = 1/max_s;
+    for (int i = 0; i < this->num_vertices; i++) {
+            this->verts[i] *= max_s;
+    }
+
+
+    return (*this);
+}

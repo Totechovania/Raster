@@ -16,6 +16,7 @@ struct Mesh
     std::vector<vec3> normals;
     std::vector<vec2> tcs;
     std::vector<int>  indices;
+    Mesh &norm();
 };
 
 // При ошибке возвращает пустой меш (num_vertices = num_triangles = 0)

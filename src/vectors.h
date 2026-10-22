@@ -39,7 +39,7 @@ struct vec_base {
     float len() const {
         static_assert(VectorLike<Derived>);
 
-        return dot(self(), self());
+        return std::sqrt(dot(self(), self()));
     }
 
     Derived& norm() {
