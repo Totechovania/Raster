@@ -45,7 +45,7 @@ static void hue_to_rgb(float hue, float rgb[3])
 
 
 
-RENDER_MODE modes[] = {RENDER_MODE::DEPTH, RENDER_MODE::WHITE, RENDER_MODE::RGB_TRINAGLE, RENDER_MODE::NORMALS};
+RENDER_MODE modes[] = {RENDER_MODE::DEPTH, RENDER_MODE::WHITE, RENDER_MODE::RGB_TRINAGLE, RENDER_MODE::NORMALS, RENDER_MODE::UV};
 int modes_size = sizeof(modes) / sizeof(RENDER_MODE);
 int mode = 0;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {

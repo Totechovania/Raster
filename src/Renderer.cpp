@@ -55,6 +55,8 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
 
             vert_buf[i].n = (model.iMt * model.mesh.normals[i]).norm();
 
+             vert_buf[i].ts =  model.mesh.tcs[i];
+
         }
 
         for (int t = 0; t < model.mesh.num_triangles; t++) {
@@ -166,10 +168,9 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                             pixels[4 * i + 0] = color;
                             pixels[4 * i + 1] = color;
                             pixels[4 * i + 2] = color;
-                            pixels[4 * i + 3] = 255;
                             break;
 
-                        case RENDER_MODE::NORMALS :
+                        case RENDER_MODE::NORMALS:
 
                             
                             norm_inter = (q0 * c[0].n + q1 * c[1].n + q2 * c[2].n).norm();
@@ -177,10 +178,13 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                             for (int ch = 0; ch < 3; ch++) {
                                 pixels[4 * i + ch] = 255 * 0.5 * (norm_inter[ch]  + 1);
                             }
+
+                            break;
                         
-                            pixels[4 * i + 3] = 255;
 
-
+                        case RENDER_MODE::UV:
+                            pixels[4 * i + 0] = 255 * (q0 * c[0].ts.x + q1 * c[1].ts.x + q2 * c[2].ts.x);
+                            pixels[4 * i + 1] = 255 * (q0 * c[0].ts.y + q1 * c[1].ts.y + q2 * c[2].ts.y);
 
                             break;
 

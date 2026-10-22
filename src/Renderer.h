@@ -18,7 +18,8 @@ enum class RENDER_MODE{
     RGB_TRINAGLE,
     WHITE,
     DEPTH,
-    NORMALS
+    NORMALS,
+    UV
 };
 
 
