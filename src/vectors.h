@@ -112,6 +112,7 @@ struct vec3: vec_base<vec3, 3>
 
     vec3(float x_v=0, float y_v=0, float z_v=0): x(x_v), y(y_v), z(z_v) {};
 
+
 };
 
 struct vec4: vec_base<vec4, 4>
@@ -139,6 +140,7 @@ struct vec4: vec_base<vec4, 4>
         M[3] = 1;
     }
 };
+
 
 
 

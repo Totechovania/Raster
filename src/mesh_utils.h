@@ -8,7 +8,7 @@
 //
 // Нормали и текстурные координаты не генерируются: если в файле их нет (или они
 // заданы не для всех вершин), normals / tcs равны NULL.
-struct mesh
+struct Mesh
 {
     int num_vertices;
     int num_triangles;
@@ -19,6 +19,6 @@ struct mesh
 };
 
 // При ошибке возвращает пустой меш (num_vertices = num_triangles = 0)
-mesh load_obj(const char *filename);
+Mesh load_obj(const char *filename);
 
 #endif

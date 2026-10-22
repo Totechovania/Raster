@@ -20,7 +20,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    mesh m = load_obj(obj_path);
+    Mesh m = load_obj(obj_path);
     if (m.num_triangles == 0)
     {
         printf("Failed to load mesh: %s\n", obj_path);

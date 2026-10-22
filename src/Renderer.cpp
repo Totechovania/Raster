@@ -3,16 +3,16 @@
 
 #include <stdio.h>
 
-Renderer::Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height)
+Renderer::Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, int vert_buf_size)
     : pixels(pixels), fb_width(fb_width), fb_height(fb_height)
 {
     this->depth_buf.resize((size_t)fb_width * fb_height);
-    this->vert_buf.resize(3); //todo
+    this->vert_buf.resize(vert_buf_size); //todo    
     this->update_P_pers();
 }
 
 
-void Renderer::render_scene() {
+void Renderer::render_scene(std::vector<Model> &models) {
         const size_t n_pixels = (size_t)fb_width * fb_height;
 
         for (size_t i = 0; i < n_pixels; i++)
@@ -36,36 +36,41 @@ void Renderer::render_scene() {
         int tri[3]{0, 1, 2};
 
         auto p2scr = [this](vec3 p) {
-            return vec3((p.x + 1) * 0.5 * fb_width, (p.y + 1) * 0.5 * fb_height);
+            return vec3((p.x + 1) * 0.5 * fb_width, (p.y + 1) * 0.5 * fb_height, p.z);
         };
 
-        this->vert_buf[tri[0]].co = p2scr(vec3(-0.5, -0.5));
-        this->vert_buf[tri[1]].co = p2scr(vec3(1, 0));
-        this->vert_buf[tri[2]].co = p2scr(vec3(0, 1));
 
-        for (auto vert: this->vert_buf) {
-            
+        for (const Model &model: models) {
+            Matrix4 MVP = VP * model.M;
+
+            for (int i = 0; i < model.mesh.num_vertices; i++) {
+                vec4 tmp = MVP * model.mesh.verts[i];
+                vert_buf[i].co = vec3(tmp.x, tmp.y, tmp.z);
+                vert_buf[i].w = tmp.w;
+            }
+
+            for (int t = 0; t < model.mesh.num_triangles; t++) {
+                Vertex c[3];
+                for (int k = 0; k < 3; k++)
+                    c[k] = vert_buf[model.mesh.indices[3*t + k]];
+
+                if (c[0].w < this->near || c[1].w < this->near || c[2].w < this->near)
+                    continue;
+
+                for (int k = 0; k < 3; k++) {
+                    c[k].co = p2scr(c[k].co * c[k].w);
+                }
+
+                rasterize_triangle(c);
+            }
         }
-
-        this->vert_buf[tri[0]].color = vec3(1);
-        this->vert_buf[tri[1]].color = vec3(0, 1);
-        this->vert_buf[tri[2]].color = vec3(0, 0, 1);
-
-
-        rasterize_triangle(tri);
 
 }
 
-void Renderer::rasterize_triangle(int tri[3]) {
-        Vertex v1 = this->vert_buf[tri[0]];
-        Vertex v2 = this->vert_buf[tri[1]];
-        Vertex v3 = this->vert_buf[tri[2]];
-        
-
-        auto scr2p = [this](float x, float y) {
-            return vec3(2.f * x / fb_width - 1, 2.f * y / fb_height - 1);
-        };
-
+void inline Renderer::rasterize_triangle(Vertex *c) {
+        Vertex &v1 = c[0];
+        Vertex &v2 = c[1];
+        Vertex &v3 = c[2];
         
 
         int p_x_max, p_x_min, p_y_max, p_y_min;
@@ -97,9 +102,9 @@ void Renderer::rasterize_triangle(int tri[3]) {
                         
 
                     int i = row * fb_width + col;
-                    pixels[4 * i + 0] = 255 * (e1 * v1.color[0] + e2 * v2.color[0] + e3 * v3.color[0]);
-                    pixels[4 * i + 1] = 255 * (e1 * v1.color[1] + e2 * v2.color[1] + e3 * v3.color[1]);
-                    pixels[4 * i + 2] = 255 * (e1 * v1.color[2] + e2 * v2.color[2] + e3 * v3.color[2]);
+                    pixels[4 * i + 0] = 255 * e1;
+                    pixels[4 * i + 1] = 255 * e2;
+                    pixels[4 * i + 2] = 255 * e3;
                     pixels[4 * i + 3] = 255;
 
                 }

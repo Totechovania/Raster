@@ -88,8 +88,13 @@ int main(int argc, char **argv)
     std::vector<uint8_t> pixels;
     pixels.resize(4 * n_pixels);
 
+    std::vector<Model> models;
+
     
-    Renderer renderer = Renderer(pixels, fb_width, fb_height);
+    Mesh m = load_obj("resources/test1.obj");
+    models.push_back(Model(m));
+
+    Renderer renderer = Renderer(pixels, fb_width, fb_height, 3);
 
 
     // const float hue_speed = 0.2f; // оборотов цветового круга в секунду
@@ -108,7 +113,7 @@ int main(int argc, char **argv)
         prev_time = now;
 
         
-        renderer.render_scene();
+        renderer.render_scene(models);
 
 
 

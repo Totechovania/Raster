@@ -33,3 +33,9 @@ Matrix4 Camera::ubdate_V() {
 
     return this->V;
 }
+
+Matrix4 Model::update_M() {
+    this->M = translate_matrix(this->translation) * rotation_matrix(this->rotation) * scale_matrix(this->scale);
+
+    return this->M;
+}

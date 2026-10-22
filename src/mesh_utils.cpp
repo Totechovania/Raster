@@ -123,9 +123,9 @@ static int valid_index(int idx, unsigned int count)
     return idx >= 0 && (unsigned int)idx < count;
 }
 
-mesh load_obj(const char *filename)
+Mesh load_obj(const char *filename)
 {
-    mesh m;
+    Mesh m;
     m.num_triangles = 0;
     m.num_vertices = 0;
 
