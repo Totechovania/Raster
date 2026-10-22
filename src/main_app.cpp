@@ -96,24 +96,21 @@ int main(int argc, char **argv)
 
     Renderer renderer = Renderer(pixels, fb_width, fb_height, m.num_vertices);
 
-
-    // const float hue_speed = 0.2f; // оборотов цветового круга в секунду
-    // float hue = 0.0f;
-
     double prev_time = glfwGetTime();
     double report_time = prev_time;
     int report_frames = 0;
 
-
+    float angle_speed = 3.14 / 5;
 
     while (!glfwWindowShouldClose(window))
     {
         const double now = glfwGetTime();
-        const float dt = (float)(now - prev_time); // длительность прошлого кадра, с
+        const float dt = (float)(now - prev_time);
         prev_time = now;
 
-        
-        renderer.render_scene(models);
+        models[0].rotation[1] += angle_speed * dt;
+        models[0].update_M();
+        renderer.render_scene(models, RENDER_MODE::WHITE);
 
 
 

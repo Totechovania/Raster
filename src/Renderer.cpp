@@ -33,7 +33,7 @@ void Renderer::reset() {
 
 }
 
-void Renderer::render_scene(std::vector<Model> &models) {
+void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
     this->reset();
 
     Matrix4 VP = this->P * this->cam.V;
@@ -78,13 +78,13 @@ void Renderer::render_scene(std::vector<Model> &models) {
  
 
 
-            rasterize_triangle(c);
+            rasterize_triangle(c, mode);
         }
     }
 
 }
 
-void inline Renderer::rasterize_triangle(Vertex *c) {
+void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
 
         
         Vertex &v1 = c[0];
@@ -122,13 +122,33 @@ void inline Renderer::rasterize_triangle(Vertex *c) {
 
                     int i = row * fb_width + col;
                     float depth = c[0].co.z * e1 + c[1].co.z * e2 +  c[2].co.z * e3;
+
+
                     if (depth < this->depth_buf[i]) {
                         this->depth_buf[i] = depth;
 
-                        pixels[4 * i + 0] = 255 * e1;
-                        pixels[4 * i + 1] = 255 * e2;
-                        pixels[4 * i + 2] = 255 * e3;
-                        pixels[4 * i + 3] = 255;
+                        switch (mode)
+                        {
+                        case RENDER_MODE::WHITE:
+                            pixels[4 * i + 0] = 255;
+                            pixels[4 * i + 1] = 255;
+                            pixels[4 * i + 2] = 255;
+                            pixels[4 * i + 3] = 255;
+                            break;
+                        case RENDER_MODE::RGB_TRINAGLE:
+                            pixels[4 * i + 0] = 255 * e1;
+                            pixels[4 * i + 1] = 255 * e2;
+                            pixels[4 * i + 2] = 255 * e3;
+                            pixels[4 * i + 3] = 255;
+                            break;
+                        
+                        default:
+                            break;
+                        }
+
+                    
+
+                        
                     }
 
                 }

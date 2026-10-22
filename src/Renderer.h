@@ -13,7 +13,11 @@ struct Vertex {
     vec3 color;
 };
 
-
+enum class RENDER_MODE{
+    RGB_TRINAGLE,
+    WHITE,
+    DEPTH,
+};
 
 struct Renderer{
     
@@ -34,9 +38,9 @@ struct Renderer{
 
     void reset();
 
-    void render_scene(std::vector<Model> &models);
+    void render_scene(std::vector<Model> &models, RENDER_MODE mode = RENDER_MODE::WHITE);
 
-    void rasterize_triangle(Vertex *c);
+    void rasterize_triangle(Vertex *c, RENDER_MODE mode);
 
     void update_P_pers(float fov = 3.14 / 2, float n = 0.01, float f = 10);
 };
