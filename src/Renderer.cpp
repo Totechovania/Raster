@@ -4,18 +4,22 @@
 #include <stdio.h>
 
 Renderer::Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, int vert_buf_size)
-    : pixels(pixels), fb_width(fb_width), fb_height(fb_height)
+    : pixels(pixels), fb_width(fb_width), fb_height(fb_height), cam()
 {
+    cam.look_at(vec3(0, 0, 1),
+        vec3(0, 0, 0), 
+        vec3(0, 1, 0));
+
     this->depth_buf.resize((size_t)fb_width * fb_height);
     this->vert_buf.resize(vert_buf_size); //todo    
     this->update_P_pers();
 }
 
 
-void Renderer::render_scene(std::vector<Model> &models) {
-        const size_t n_pixels = (size_t)fb_width * fb_height;
+void Renderer::reset() {
+    const size_t n_pixels = (size_t)fb_width * fb_height;
 
-        for (size_t i = 0; i < n_pixels; i++)
+    for (size_t i = 0; i < n_pixels; i++)
         {
             pixels[4 * i + 0] = 0;
             pixels[4 * i + 1] = 0;
@@ -24,50 +28,61 @@ void Renderer::render_scene(std::vector<Model> &models) {
         }
 
         for (size_t i = 0; i < n_pixels; i++) {
-            this->depth_buf[i] = -INFINITY; //?
-        }
-
-
-
-        Matrix4 VP = this->P * this->cam.V;
-
-        
-        
-        int tri[3]{0, 1, 2};
-
-        auto p2scr = [this](vec3 p) {
-            return vec3((p.x + 1) * 0.5 * fb_width, (p.y + 1) * 0.5 * fb_height, p.z);
-        };
-
-
-        for (const Model &model: models) {
-            Matrix4 MVP = VP * model.M;
-
-            for (int i = 0; i < model.mesh.num_vertices; i++) {
-                vec4 tmp = MVP * model.mesh.verts[i];
-                vert_buf[i].co = vec3(tmp.x, tmp.y, tmp.z);
-                vert_buf[i].w = tmp.w;
-            }
-
-            for (int t = 0; t < model.mesh.num_triangles; t++) {
-                Vertex c[3];
-                for (int k = 0; k < 3; k++)
-                    c[k] = vert_buf[model.mesh.indices[3*t + k]];
-
-                if (c[0].w < this->near || c[1].w < this->near || c[2].w < this->near)
-                    continue;
-
-                for (int k = 0; k < 3; k++) {
-                    c[k].co = p2scr(c[k].co * c[k].w);
-                }
-
-                rasterize_triangle(c);
-            }
+            this->depth_buf[i] = INFINITY; //?
         }
 
 }
 
+void Renderer::render_scene(std::vector<Model> &models) {
+    this->reset();
+
+    Matrix4 VP = this->P * this->cam.V;
+
+    
+    
+    int tri[3]{0, 1, 2};
+
+    auto p2scr = [this](vec3 p) {
+        return vec3((p.x + 1) * 0.5 * fb_width, (p.y + 1) * 0.5 * fb_height, p.z);
+    };
+
+
+    for (const Model &model: models) {
+        Matrix4 MVP = VP * model.M;
+
+        for (int i = 0; i < model.mesh.num_vertices; i++) {
+            vec4 tmp = MVP * model.mesh.verts[i];
+            vert_buf[i].co = vec3(tmp.x, tmp.y, tmp.z);
+            vert_buf[i].w = tmp.w;
+        }
+
+        for (int t = 0; t < model.mesh.num_triangles; t++) {
+            Vertex c[3];
+            for (int k = 0; k < 3; k++)
+                c[k] = vert_buf[model.mesh.indices[3*t + k]];
+
+            
+
+            if (std::abs(c[0].w) < this->near || std::abs(c[1].w) < this->near || std::abs(c[2].w) < this->near)
+                continue;
+
+            if (c[0].co.z >= c[0].w || c[1].co.z >= c[1].w || c[2].co.z >= c[2].w)
+                continue;
+
+                
+            for (int k = 0; k < 3; k++) {
+                c[k].co = p2scr(c[k].co * (1 / c[k].w));
+            }
+
+            rasterize_triangle(c);
+        }
+    }
+
+}
+
 void inline Renderer::rasterize_triangle(Vertex *c) {
+
+        
         Vertex &v1 = c[0];
         Vertex &v2 = c[1];
         Vertex &v3 = c[2];
@@ -113,11 +128,12 @@ void inline Renderer::rasterize_triangle(Vertex *c) {
         }
 }
 
-void Renderer::update_P_pers(float fov, float a, float n, float f) {
+void Renderer::update_P_pers(float fov, float n, float f) {
+    float a = this->fb_width / (float) this->fb_height;
     this->near = n;
 
     float c = 1 / std::tan(fov /2);
-    this->P.fill_identity();
+    this->P.fill_zeros();
 
     this->P(0, 0) = c / a;
     this->P(1, 1) = c;

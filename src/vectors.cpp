@@ -20,7 +20,7 @@ vec4 operator*(const Matrix4 &m, const vec4 &v) {
     for (int i = 0; i < 4; i++) {
         res[i] = 0;
         for (int j = 0; j < m.size; j++) {
-            res[i] += m(j, i) * v[i];
+            res[i] += m(i, j) * v[j];
         }
     }
 

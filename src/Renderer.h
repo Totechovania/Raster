@@ -32,9 +32,11 @@ struct Renderer{
 
     Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, int vert_buf_size);
 
+    void reset();
+
     void render_scene(std::vector<Model> &models);
 
     void rasterize_triangle(Vertex *c);
 
-    void update_P_pers(float fov = 3.14 / 2, float a = 1, float n = 0.01, float f = 2);
+    void update_P_pers(float fov = 3.14 / 2, float n = 0.01, float f = 10);
 };
