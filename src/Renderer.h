@@ -2,8 +2,15 @@
 #include "scene_objects.h"
 #include "vectors.h"
 #include <math.h>
+#include <math.h>
+#include <algorithm>
 
-
+struct Vertex {
+    vec3 co;
+    vec3 n;
+    vec2 ts;
+    vec3 color;
+};
 
 
 
@@ -12,15 +19,23 @@ struct Renderer{
     std::vector<uint8_t> &pixels;
     std::vector<float> depth_buf;
 
+    std::vector<Vertex> vert_buf;
+
     int &fb_width;
     int &fb_height;
 
+    float near;
     Matrix4 P;
+
+    Camera cam;
 
     Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height);
 
     void
-    render_scene(Camera &cam);
+    render_scene();
+
+    void
+    rasterize_triangle(int tri[3]);
 
     void
     update_P_pers(float fov = 3.14 / 2, float a = 1, float n = 0.01, float f = 2);

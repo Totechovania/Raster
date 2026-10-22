@@ -15,6 +15,8 @@ struct Camera {
     };
 
     Matrix4 ubdate_V();
+
+    Matrix4 look_at(vec3 eye, vec3 target, vec3 up);
         
 };
 

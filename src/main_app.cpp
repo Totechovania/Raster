@@ -89,7 +89,6 @@ int main(int argc, char **argv)
     pixels.resize(4 * n_pixels);
 
     
-    Camera cam = Camera();
     Renderer renderer = Renderer(pixels, fb_width, fb_height);
 
 
@@ -109,7 +108,7 @@ int main(int argc, char **argv)
         prev_time = now;
 
         
-        renderer.render_scene(cam);
+        renderer.render_scene();
 
 
 
