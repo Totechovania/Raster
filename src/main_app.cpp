@@ -110,7 +110,7 @@ int main(int argc, char **argv)
 
         models[0].rotation[1] += angle_speed * dt;
         models[0].update_M();
-        renderer.render_scene(models, RENDER_MODE::WHITE);
+        renderer.render_scene(models, RENDER_MODE::DEPTH);
 
 
 
@@ -122,6 +122,8 @@ int main(int argc, char **argv)
         const double elapsed = glfwGetTime() - report_time;
         if (elapsed >= 1.0)
         {
+            
+
             printf("frame time: %.3f ms (%.1f FPS)\n",
                    1000.0 * elapsed / report_frames, report_frames / elapsed);
             fflush(stdout);

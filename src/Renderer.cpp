@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 Renderer::Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, int vert_buf_size)
-    : pixels(pixels), fb_width(fb_width), fb_height(fb_height), cam()
+    : pixels(pixels), fb_width(fb_width), fb_height(fb_height), PSI(), cam()
 {
     cam.look_at(vec3(0, 0, 2),
         vec3(0, 0, 0), 
@@ -13,6 +13,7 @@ Renderer::Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, 
     this->depth_buf.resize((size_t)fb_width * fb_height);
     this->vert_buf.resize(vert_buf_size); //todo    
     this->update_P_pers();
+
 }
 
 
@@ -43,6 +44,7 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
     };
 
 
+    PSI.reset_depth();
     for (const Model &model: models) {
         Matrix4 MVP = VP * model.M;
         
@@ -55,6 +57,8 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
             vec4 tmp = MVP * v4;
             vert_buf[i].co = vec3(tmp.x, tmp.y, tmp.z);
             vert_buf[i].w = tmp.w;
+
+           
         }
 
         for (int t = 0; t < model.mesh.num_triangles; t++) {
@@ -126,6 +130,7 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
 
                     if (depth < this->depth_buf[i]) {
                         this->depth_buf[i] = depth;
+                      
 
                         switch (mode)
                         {
@@ -141,6 +146,22 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                             pixels[4 * i + 2] = 255 * e3;
                             pixels[4 * i + 3] = 255;
                             break;
+
+                        case RENDER_MODE::DEPTH:
+                            PSI.update_depth(depth);
+                            float color;
+                            if (std::abs(PSI.max_depth_pr - PSI.min_depth_pr) > 1e-10) {
+                                color = 255 * ((1 - (depth - PSI.min_depth_pr) / (PSI.max_depth_pr - PSI.min_depth_pr)) * 0.7  + 0.2);
+                            } else {
+                                color = 255 * 0.7;
+                            }
+                            
+                            pixels[4 * i + 0] = color;
+                            pixels[4 * i + 1] = color;
+                            pixels[4 * i + 2] = color;
+                            pixels[4 * i + 3] = 255;
+                            break;
+
                         
                         default:
                             break;

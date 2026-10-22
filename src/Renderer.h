@@ -19,6 +19,38 @@ enum class RENDER_MODE{
     DEPTH,
 };
 
+
+struct PixelShaderInfo{
+    float max_depth_cur;
+    float min_depth_cur;
+    float max_depth_pr;
+    float min_depth_pr;
+
+    PixelShaderInfo() {
+        max_depth_cur = -1;
+        min_depth_cur = 1;
+    };
+
+    void
+    reset_depth() {
+        min_depth_pr = min_depth_cur;
+        max_depth_pr = max_depth_cur;
+
+        max_depth_cur = -1;
+        min_depth_cur = 1;
+    }
+
+    void 
+    update_depth(float d) {
+        if (d > max_depth_cur) {
+            max_depth_cur = d;
+        } else if (d < min_depth_cur) {
+            min_depth_cur = d;
+        }
+
+    }
+};
+
 struct Renderer{
     
     std::vector<uint8_t> &pixels;
@@ -26,13 +58,19 @@ struct Renderer{
 
     std::vector<Vertex> vert_buf;
 
+    
     int &fb_width;
     int &fb_height;
 
     float near;
     Matrix4 P;
 
+    PixelShaderInfo PSI;
+
+
     Camera cam;
+
+    
 
     Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, int vert_buf_size);
 
