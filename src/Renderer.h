@@ -8,6 +8,7 @@
 struct Vertex {
     vec3 co;
     float w;
+    float iw;
     vec3 n;
     vec2 ts;
     vec3 color;
@@ -17,6 +18,7 @@ enum class RENDER_MODE{
     RGB_TRINAGLE,
     WHITE,
     DEPTH,
+    NORMALS
 };
 
 

@@ -24,12 +24,6 @@ static void glfw_error_callback(int error, const char *description)
     fprintf(stderr, "GLFW error %d: %s\n", error, description);
 }
 
-static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods)
-{
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-}
-
 static float clamp01(float x)
 {
     return x < 0.0f ? 0.0f : (x > 1.0f ? 1.0f : x);
@@ -48,6 +42,24 @@ static void hue_to_rgb(float hue, float rgb[3])
     rgb[1] = clamp01(2.0f - fabsf(h - 2.0f));
     rgb[2] = clamp01(2.0f - fabsf(h - 4.0f));
 }
+
+
+
+RENDER_MODE modes[] = {RENDER_MODE::DEPTH, RENDER_MODE::WHITE, RENDER_MODE::RGB_TRINAGLE, RENDER_MODE::NORMALS};
+int modes_size = sizeof(modes) / sizeof(RENDER_MODE);
+int mode = 0;
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_M && action == GLFW_PRESS) {
+        mode = (mode + 1) % modes_size;
+    }
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+    
+}
+
+
 
 int main(int argc, char **argv)
 {
@@ -94,6 +106,10 @@ int main(int argc, char **argv)
     Mesh m = load_obj("resources/Bunny.obj").norm();
     models.push_back(Model(m));
 
+    models.push_back(Model(m));
+
+    
+ 
     Renderer renderer = Renderer(pixels, fb_width, fb_height, m.num_vertices);
 
     double prev_time = glfwGetTime();
@@ -102,15 +118,21 @@ int main(int argc, char **argv)
 
     float angle_speed = 3.14 / 5;
 
+
+    glfwSetKeyCallback(window, key_callback);
+
     while (!glfwWindowShouldClose(window))
     {
         const double now = glfwGetTime();
         const float dt = (float)(now - prev_time);
         prev_time = now;
 
+
+
         models[0].rotation[1] += angle_speed * dt;
         models[0].update_M();
-        renderer.render_scene(models, RENDER_MODE::DEPTH);
+
+        renderer.render_scene(models, modes[mode]);
 
 
 

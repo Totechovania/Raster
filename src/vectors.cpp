@@ -25,6 +25,19 @@ vec4 operator*(const Matrix4 &m, const vec4 &v) {
     }
 
     return res;
+}
+vec3 operator*(const Matrix3 &m, const vec3 &v)
+{
+    vec3 res;
+
+    for (int i = 0; i < 3; i++) {
+        res[i] = 0;
+        for (int j = 0; j < 3; j++) {
+            res[i] += m(i, j) * v[j];
+        }
+    }
+
+    return res;;
 };
 
 Matrix4::Matrix4(const Matrix3 m3) {
@@ -343,13 +356,17 @@ std::ostream& operator<<(std::ostream &os, const Matrix4 &a) {
     return os;
 }
 
+Matrix3::Matrix3(const Matrix4 &m) {
 
+    for (int i = 0; i < 3; i++) {    
+        for (int j = 0; j < 3; j++) {
+            (*this)(i, j) = m(i, j);       
+        }
+    }
+}
 
-
-
-
-
-float &Matrix3::operator()(int i, int j){
+float &Matrix3::operator()(int i, int j)
+{
     if (i < 0 || i >= this->size || j < 0 || j >= this->size) {
         throw std::out_of_range("Matrix3 index out of range");
     }

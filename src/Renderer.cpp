@@ -49,16 +49,12 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
         Matrix4 MVP = VP * model.M;
         
         for (int i = 0; i < model.mesh.num_vertices; i++) {
-            vec4 v4(model.mesh.verts[i].x,
-                    model.mesh.verts[i].y,
-                    model.mesh.verts[i].z,
-                    1.0f
-            );
-            vec4 tmp = MVP * v4;
+            vec4 tmp = MVP * vec4(model.mesh.verts[i]);
             vert_buf[i].co = vec3(tmp.x, tmp.y, tmp.z);
             vert_buf[i].w = tmp.w;
 
-           
+            vert_buf[i].n = (model.iMt * model.mesh.normals[i]).norm();
+
         }
 
         for (int t = 0; t < model.mesh.num_triangles; t++) {
@@ -76,8 +72,8 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
 
                 
             for (int k = 0; k < 3; k++) {
-                c[k].co = p2scr(c[k].co * (1 / c[k].w));
-               
+                c[k].iw = 1 / c[k].w;
+                c[k].co = p2scr(c[k].co * c[k].iw);
             }
  
 
@@ -118,15 +114,26 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                 float e3 = edge_func(v3.co, v1.co, p_co); 
 
                 if (e1 > 0 && e2 > 0 && e3 >0) {
-                    float s = (e1 + e2 + e3);
-                    e1 /= s;
-                    e2 /= s;
-                    e3 /= s;
+                    float s = 1.f /(e1 + e2 + e3);
+                    e1 *= s;
+                    e2 *= s;
+                    e3 *= s;
+
+                    float q0 = e1 * c[0].iw;
+                    float q1 = e2 * c[1].iw;
+                    float q2 = e2 * c[2].iw;
+                    s = 1.0f / (q0 + q1 + q2);
+                    
+                    q0 *= s; 
+                    q1 *= s; 
+                    q2 *= s;
+
                         
 
                     int i = row * fb_width + col;
                     float depth = c[0].co.z * e1 + c[1].co.z * e2 +  c[2].co.z * e3;
 
+                    vec3 norm_inter{};
 
                     if (depth < this->depth_buf[i]) {
                         this->depth_buf[i] = depth;
@@ -162,7 +169,21 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                             pixels[4 * i + 3] = 255;
                             break;
 
+                        case RENDER_MODE::NORMALS :
+
+                            
+                            norm_inter = (q0 * c[0].n + q1 * c[1].n + q2 * c[2].n).norm();
+
+                            for (int ch = 0; ch < 3; ch++) {
+                                pixels[4 * i + ch] = 255 * 0.5 * (norm_inter[ch]  + 1);
+                            }
                         
+                            pixels[4 * i + 3] = 255;
+
+
+
+                            break;
+
                         default:
                             break;
                         }

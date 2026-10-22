@@ -30,6 +30,7 @@ struct Model {
     vec3 translation;
 
     Matrix4 M;
+    Matrix3 iMt;
 
     Model(Mesh &mesh, vec3 translation = vec3(), vec3 rotation = vec3(), vec3 scale = vec3(1, 1, 1)): 
         mesh(mesh),

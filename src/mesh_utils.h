@@ -17,6 +17,7 @@ struct Mesh
     std::vector<vec2> tcs;
     std::vector<int>  indices;
     Mesh &norm();
+    Mesh &generate_normals();
 };
 
 // При ошибке возвращает пустой меш (num_vertices = num_triangles = 0)

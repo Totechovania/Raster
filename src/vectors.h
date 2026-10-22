@@ -5,7 +5,8 @@
 #include <stdexcept>
 #include <math.h>
 
-
+struct Matrix3;
+struct Matrix4;
 // Минимальный набор векторных типов, нужный утилитам шаблона.
 // Остальную математику (операции над векторами, матрицы) вы пишете сами.
 
@@ -256,6 +257,7 @@ struct Matrix3 {
     float data[size * size];
 
     explicit Matrix3() {};
+    explicit Matrix3(const Matrix4 &m);
     float &operator()(int i, int j);
     const float &operator()(int i, int j) const;
     Matrix3 &fill_zeros();
@@ -352,5 +354,7 @@ Matrix4 translate_matrix(const vec3 &s_v);
 
 
 vec4 operator*(const Matrix4 &m, const vec4 &v);
+vec3 operator*(const Matrix3 &m, const vec3 &v);
+
 
 #endif
