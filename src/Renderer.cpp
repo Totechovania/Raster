@@ -55,7 +55,7 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
 
             vert_buf[i].n = (model.iMt * model.mesh.normals[i]).norm();
 
-             vert_buf[i].ts =  model.mesh.tcs[i];
+            vert_buf[i].ts =  model.mesh.tcs[i];
 
         }
 
@@ -135,7 +135,10 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                     int i = row * fb_width + col;
                     float depth = c[0].co.z * e1 + c[1].co.z * e2 +  c[2].co.z * e3;
 
-                    vec3 norm_inter{};
+                    vec3 norm_inter = (q0 * c[0].n + q1 * c[1].n + q2 * c[2].n).norm();
+
+                    float l_light;
+                    vec3 albedo{1};
 
                     if (depth < this->depth_buf[i]) {
                         this->depth_buf[i] = depth;
@@ -147,13 +150,11 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                             pixels[4 * i + 0] = 255;
                             pixels[4 * i + 1] = 255;
                             pixels[4 * i + 2] = 255;
-                            pixels[4 * i + 3] = 255;
                             break;
                         case RENDER_MODE::RGB_TRINAGLE:
                             pixels[4 * i + 0] = 255 * e1;
                             pixels[4 * i + 1] = 255 * e2;
                             pixels[4 * i + 2] = 255 * e3;
-                            pixels[4 * i + 3] = 255;
                             break;
 
                         case RENDER_MODE::DEPTH:
@@ -172,15 +173,22 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
 
                         case RENDER_MODE::NORMALS:
 
-                            
-                            norm_inter = (q0 * c[0].n + q1 * c[1].n + q2 * c[2].n).norm();
-
                             for (int ch = 0; ch < 3; ch++) {
                                 pixels[4 * i + ch] = 255 * 0.5 * (norm_inter[ch]  + 1);
                             }
 
                             break;
                         
+                        case RENDER_MODE::LAMBERT:
+                            l_light = dot(norm_inter, PSI.light_direction);
+                            if (l_light > 1) l_light = 1;
+                            if (l_light < 0) l_light = 0;
+                            
+                            for (int ch = 0; ch < 3; ch++) {
+                                pixels[4 * i + ch] = 255 * l_light * (albedo[ch] * 0.7 + 0.2);
+                            }
+
+                            break;
 
                         case RENDER_MODE::UV:
                             pixels[4 * i + 0] = 255 * (q0 * c[0].ts.x + q1 * c[1].ts.x + q2 * c[2].ts.x);

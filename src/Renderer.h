@@ -19,7 +19,8 @@ enum class RENDER_MODE{
     WHITE,
     DEPTH,
     NORMALS,
-    UV
+    UV,
+    LAMBERT
 };
 
 
@@ -28,10 +29,14 @@ struct PixelShaderInfo{
     float min_depth_cur;
     float max_depth_pr;
     float min_depth_pr;
+    
+    vec3 light_direction;
 
     PixelShaderInfo() {
         max_depth_cur = -1;
         min_depth_cur = 1;
+
+        light_direction = -vec3(1, -1).norm();
     };
 
     void
