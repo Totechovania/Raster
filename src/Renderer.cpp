@@ -45,7 +45,9 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
 
 
     PSI.reset_depth();
-    for (const Model &model: models) {
+    for (Model &model: models) {
+        PSI.model = &model;
+
         Matrix4 MVP = VP * model.M;
         
         for (int i = 0; i < model.mesh.num_vertices; i++) {
@@ -55,8 +57,9 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
 
             vert_buf[i].n = (model.iMt * model.mesh.normals[i]).norm();
 
-            vert_buf[i].ts =  model.mesh.tcs[i];
-
+            if (model.mesh.has_uv_co) {
+                vert_buf[i].ts =  model.mesh.tcs[i];
+            } 
         }
 
        
@@ -113,9 +116,9 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
             for (int col = p_x_min; col < p_x_max + 1; col++) {
                 vec3 p_co = vec3(col, row);
                 
-                float e1 = edge_func(v1.co, v2.co, p_co); 
-                float e2 = edge_func(v2.co, v3.co, p_co); 
-                float e3 = edge_func(v3.co, v1.co, p_co); 
+                float e1 = edge_func(v2.co, v3.co, p_co); 
+                float e2 = edge_func(v3.co, v1.co, p_co); 
+                float e3 = edge_func(v1.co, v2.co, p_co); 
 
                 if (e1 > 0 && e2 > 0 && e3 >0) {
                     float s = 1.f /(e1 + e2 + e3);
@@ -138,6 +141,7 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                     float depth = c[0].co.z * e1 + c[1].co.z * e2 +  c[2].co.z * e3;
 
                     vec3 norm_inter = (q0 * c[0].n + q1 * c[1].n + q2 * c[2].n).norm();
+                    vec2 uv{q0 * c[0].ts.x + q1 * c[1].ts.x + q2 * c[2].ts.x, q0 * c[0].ts.y + q1 * c[1].ts.y + q2 * c[2].ts.y};
 
                     float l_light;
 
@@ -187,14 +191,14 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                             if (l_light < 0) l_light = 0;
                             
                             for (int ch = 0; ch < 3; ch++) {
-                                pixels[4 * i + ch] = 255 * l_light * (PSI.albedo[ch] * 0.7 + 0.2);
+                                pixels[4 * i + ch] = 255 * PSI.model->get_texture(uv.x, uv.y, ch) * (l_light * 0.85 + 0.15);
                             }
 
                             break;
 
                         case RENDER_MODE::UV:
-                            pixels[4 * i + 0] = 255 * (q0 * c[0].ts.x + q1 * c[1].ts.x + q2 * c[2].ts.x);
-                            pixels[4 * i + 1] = 255 * (q0 * c[0].ts.y + q1 * c[1].ts.y + q2 * c[2].ts.y);
+                            pixels[4 * i + 0] = 255 * uv.x;
+                            pixels[4 * i + 1] = 255 * uv.y;
 
                             break;
 

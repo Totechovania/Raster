@@ -3,6 +3,7 @@
 #include "image_utils.h"
 #include "external/stb_image.h"
 #include "external/stb_image_write.h"
+#include <vector>
 
 static inline unsigned char tonemap(float x, float a_gammaInv)
 {
@@ -75,15 +76,17 @@ int save_image_f32_png_rgb(const float *data, const char *filename, int w, int h
     return res;
 }
 
-float *load_image_f32_rgb(const char *filename, int *w, int *h, float gamma)
+std::vector<float> load_image_f32_rgb(const char *filename, int *w, int *h, float gamma)
 {
+    std::vector<float> data_f32;
+
     int channels = 0;
     stbi_uc *raw_data = stbi_load(filename, w, h, &channels, 3);
     if (channels != 3 || raw_data == NULL || *w <= 0 || *h <= 0)
     {
         if (raw_data)
             STBI_FREE(raw_data);
-        return NULL;
+        return data_f32;
     }
 
     //swap y
@@ -103,7 +106,10 @@ float *load_image_f32_rgb(const char *filename, int *w, int *h, float gamma)
     }
 
     int sz = 3*(*w)*(*h);
-    float *data_f32 = (float *) malloc(sz*sizeof(float));
+
+    
+    data_f32.resize(sz);
+
     for (int i=0; i<sz; i++)
         data_f32[i] = powf(raw_data[i]/255.0f, gamma);
 

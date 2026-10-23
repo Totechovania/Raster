@@ -44,7 +44,7 @@ static void hue_to_rgb(float hue, float rgb[3])
 }
 
 
-RENDER_MODE modes[] = {RENDER_MODE::DEPTH, RENDER_MODE::NORMALS, RENDER_MODE::UV, RENDER_MODE::LAMBERT};
+RENDER_MODE modes[] = { RENDER_MODE::LAMBERT, RENDER_MODE::DEPTH, RENDER_MODE::NORMALS, RENDER_MODE::UV,};
 int modes_size = sizeof(modes) / sizeof(RENDER_MODE);
 int mode = 0;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -102,13 +102,14 @@ int main(int argc, char **argv)
     std::vector<Model> models;
 
     
-    Mesh m = load_obj("resources/Bunny.obj").norm();
-    models.push_back(Model(m));
-    models.push_back(Model(m).scale(vec3(2, 0.8, 1)));
+    Mesh m = Mesh("resources/Bunny.obj");
+    models.push_back(Model(m, "resources/textures/porcelain.jpg", 640, 480));
+    models.push_back(Model(m).scale(vec3(2, 0.8, 1)).translate(vec3(0, 0, -0.3)));
 
     
  
     Renderer renderer = Renderer(pixels, fb_width, fb_height, m.num_vertices);
+    renderer.PSI.light_direction = vec3(0, 1, 1).norm(); 
 
     double prev_time = glfwGetTime();
     double report_time = prev_time;

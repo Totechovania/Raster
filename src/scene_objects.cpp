@@ -38,7 +38,53 @@ Matrix4 Camera::look_at(vec3 eye, vec3 target, vec3 up)
     return this->update_V();
 }
 
-Matrix4 Model::update_M() {
+float Model::texture_at(int x, int y, int ch) {
+   
+
+
+    if (x < 0) x = 0;
+    if (x >= t_shape.w) x = t_shape.w - 1;
+
+    if (y < 0) y = 0;
+    if (y >= t_shape.h) y = t_shape.h - 1;
+
+    if (has_texture) {
+        return texture[(y*t_shape.w + x)*3 + ch];
+    }
+
+    return base_color[ch];
+}
+
+float Model::get_texture(float x, float y, int ch)
+{
+   
+    if (has_texture && t_shape.w != 0 && t_shape.h != 0) {
+        x = x - std::floor(x);
+        y = y - std::floor(y);
+        x = 1 - x;
+
+        x = t_shape.w * x - 0.5f;
+        y = t_shape.h * y - 0.5f;
+
+        float a = x - std::floor(x);
+        float b = y - std::floor(y);
+
+        float c = (1 - a) * (1 - b) * texture_at(x - a, y - b, ch) + 
+                (a) * (1 - b) * texture_at(x - a + 1, y - b, ch) + 
+                (1 - a) * (b) * texture_at(x - a, y - b + 1, ch) + 
+                (a) * (b) * texture_at(x - a + 1, y - b + 1, ch);
+
+        if (c < 0) c = 0;
+        if (c > 1) c = 1;
+        
+        return c;
+    } else {
+        return base_color[ch];
+    }
+}
+
+Matrix4 Model::update_M()
+{
     this->M = translate_matrix(this->translation_v) * rotation_matrix(this->rotation_v) * scale_matrix(this->scale_v);
 
     iMt =  Matrix3(M).inverse().transpose();

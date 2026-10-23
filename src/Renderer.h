@@ -34,7 +34,7 @@ struct PixelShaderInfo{
     
     //lambert
     vec3 light_direction;
-    vec3 albedo = vec3(1);
+    Model *model;
     
     
 
@@ -44,8 +44,8 @@ struct PixelShaderInfo{
         min_depth_cur = 1;
 
         //lambert
-        light_direction = vec3(0, 0, 1).norm();
-        albedo = vec3(1);
+        light_direction = vec3(0, 1, 1).norm();
+        model = NULL;
     };
 
     //depth filrter

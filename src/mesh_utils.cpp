@@ -123,11 +123,11 @@ static int valid_index(int idx, unsigned int count)
     return idx >= 0 && (unsigned int)idx < count;
 }
 
-Mesh load_obj(const char *filename)
+Mesh::Mesh(const char *filename)
 {
-    Mesh m;
-    m.num_triangles = 0;
-    m.num_vertices = 0;
+    this->num_triangles = 0;
+    this->num_vertices = 0;
+    
 
     tinyobj_attrib_t attrib;
     tinyobj_shape_t *shapes = NULL;
@@ -140,7 +140,7 @@ Mesh load_obj(const char *filename)
         tinyobj_parse_obj(&attrib, &shapes, &num_shapes, &materials,
                           &num_materials, filename, get_file_data, NULL, flags);
     if (ret != TINYOBJ_SUCCESS)
-        return m;
+        return;
 
     const int num_corners = attrib.num_faces;
 
@@ -156,11 +156,11 @@ Mesh load_obj(const char *filename)
 
     if (valid)
     {
-        m.verts.resize(num_corners);
-        if (has_normals) m.normals.resize(num_corners);
-        if (has_tcs) m.tcs.resize(num_corners);
-        m.indices.resize(num_corners);
-        m.num_triangles = num_corners/3;
+        this->verts.resize(num_corners);
+        if (has_normals) this->normals.resize(num_corners);
+        if (has_tcs) this->tcs.resize(num_corners);
+        this->indices.resize(num_corners);
+        this->num_triangles = num_corners/3;
 
         uint32_t table_size = 1;
         while (table_size < 2 * (uint32_t)num_corners)
@@ -182,27 +182,29 @@ Mesh load_obj(const char *filename)
 
             if (table[slot].id < 0)
             {
-                const int id = m.num_vertices++;
+                const int id = this->num_vertices++;
                 table[slot].v_idx = v_idx;
                 table[slot].vt_idx = vt_idx;
                 table[slot].vn_idx = vn_idx;
                 table[slot].id = id;
 
-                m.verts[id] = vec3(attrib.vertices[3 * v_idx + 0], attrib.vertices[3 * v_idx + 1], attrib.vertices[3 * v_idx + 2]);
+                this->verts[id] = vec3(attrib.vertices[3 * v_idx + 0], attrib.vertices[3 * v_idx + 1], attrib.vertices[3 * v_idx + 2]);
                 if (has_normals)
-                    m.normals[id] = vec3(attrib.normals[3 * vn_idx + 0], attrib.normals[3 * vn_idx + 1], attrib.normals[3 * vn_idx + 2]);
+                    this->normals[id] = vec3(attrib.normals[3 * vn_idx + 0], attrib.normals[3 * vn_idx + 1], attrib.normals[3 * vn_idx + 2]);
                 if (has_tcs)
-                    m.tcs[id] = vec2(attrib.texcoords[2 * vt_idx + 0], attrib.texcoords[2 * vt_idx + 1]);
+                    this->tcs[id] = vec2(attrib.texcoords[2 * vt_idx + 0], attrib.texcoords[2 * vt_idx + 1]);
             }
 
-            m.indices[i] = table[slot].id;
+            this->indices[i] = table[slot].id;
         }
 
         free(table);
 
-        m.verts.resize(m.num_vertices);
-        if (has_normals) m.normals.resize(m.num_vertices);
-        if (has_tcs)     m.tcs.resize(m.num_vertices);
+        this->verts.resize(this->num_vertices);
+        if (has_normals) this->normals.resize(this->num_vertices); else this->generate_normals();
+
+        this->has_uv_co = has_tcs;
+        if (has_tcs)     this->tcs.resize(this->num_vertices);
     }
     else
     {
@@ -212,7 +214,8 @@ Mesh load_obj(const char *filename)
     tinyobj_attrib_free(&attrib);
     tinyobj_shapes_free(shapes, num_shapes);
     tinyobj_materials_free(materials, num_materials);
-    return m;
+
+    this->norm();
 }
 
 Mesh &Mesh::norm() {
@@ -250,4 +253,32 @@ Mesh &Mesh::norm() {
 
 
     return (*this);
+}
+
+Mesh &Mesh::generate_normals() {
+    normals.resize(num_vertices);
+    
+
+    for (auto n: normals) {
+        n = vec3();
+    }
+
+    for (int t = 0; t < num_triangles; t++) {
+        int i0 = indices[3*t];
+        int i1 = indices[3*t + 1];
+        int i2 = indices[3*t + 2];
+        vec3 e1 = verts[i1] - verts[i0];
+        vec3 e2 = verts[i2] - verts[i0];
+        vec3 n = cross(e1, e2);
+        normals[i0] += n;
+        normals[i1] += n;
+        normals[i2] += n;
+
+    }
+
+    for (int i = 0; i < num_vertices; i++) normals[i].norm();
+
+
+    return (*this);
+    
 }

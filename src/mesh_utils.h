@@ -16,11 +16,16 @@ struct Mesh
     std::vector<vec3> normals;
     std::vector<vec2> tcs;
     std::vector<int>  indices;
+
+    bool has_uv_co;
+    
+    // При ошибке возвращает пустой меш (num_vertices = num_triangles = 0)
+    Mesh(const char *filename);
     Mesh &norm();
     Mesh &generate_normals();
 };
 
-// При ошибке возвращает пустой меш (num_vertices = num_triangles = 0)
-Mesh load_obj(const char *filename);
+
+
 
 #endif

@@ -1,6 +1,7 @@
 #include "vectors.h"
 #include "mesh_utils.h"
-
+#include "image_utils.h"
+#include <stdint.h>
 
 
 struct Camera {
@@ -31,15 +32,44 @@ struct Model {
 
     Matrix4 M;
     Matrix3 iMt;
-
-    Model(Mesh &mesh, vec3 translation = vec3(), vec3 rotation = vec3(), vec3 scale = vec3(1, 1, 1)): 
-        mesh(mesh),
-        scale_v(scale),
-        rotation_v(rotation),
-        translation_v(translation) 
+    
+    bool has_texture;
+    std::vector<float> texture;
+    struct 
     {
+        int h;
+        int w;
+    } t_shape;
+    
+    vec3 base_color;
+
+    Model(Mesh &mesh, const char *texture_file="", int w=0, int h=0, float gamma=2.2): 
+        mesh(mesh)   
+    {
+        scale_v = vec3(1, 1, 1);
+        rotation_v = vec3();
+        translation_v = vec3();
+
+        texture = load_image_f32_rgb(texture_file, &w, &h, gamma); 
+        if (texture.size() == 0) {
+            has_texture = false;
+            t_shape.h = 0;
+            t_shape.w = 0;
+        } else {
+            has_texture = true;
+            
+            t_shape.h = h;
+            t_shape.w = w;
+        }
+
+        base_color = vec3(1);
+
         update_M();
     };
+
+    float texture_at(int x, int y, int ch);
+
+    float get_texture(float x, float y, int ch);
 
     Matrix4 update_M();
 

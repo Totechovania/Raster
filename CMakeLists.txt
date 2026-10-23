@@ -13,8 +13,8 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     if(MSVC)
         add_compile_options(/Wall /wd4505 /wd5045 /wd4820 /wd4242 /wd4244 /wd4996 /wd4668 /wd4100 /Od /Zi /DEBUG)
     else()
-        add_compile_options(-Wall -Wno-unused-function -O0 -g -flto)
-        add_link_options(-flto=auto)
+        add_compile_options(-Wall -Wno-unused-function -O0 -g)
+        add_link_options()
     endif()
 elseif(CMAKE_BUILD_TYPE STREQUAL "Profile")
     add_compile_options(-Wall -Wno-unused-function -O3 -march=native -pg -flto)
@@ -49,8 +49,8 @@ if(OpenMP_CXX_FOUND)
 endif()
 
 # --- консольная программа: меш + картинка -> PNG ---------------------------
-add_executable(main_cli src/main_cli.cpp)
-target_link_libraries(main_cli PRIVATE raster_utils)
+#add_executable(main_cli src/main_cli.cpp)
+#target_link_libraries(main_cli PRIVATE raster_utils)
 
 # --- программа с окном (нужен GLFW) ---------------------------------------
 set(OpenGL_GL_PREFERENCE GLVND)
