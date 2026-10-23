@@ -321,7 +321,7 @@ Matrix4 &Matrix4::operator*=(float b)
 
 Matrix4 &Matrix4::transpose() {
     for (int i = 0; i < this->size; i++) {       
-        for (int j = 0; j < this->size; j++) {
+        for (int j = i + 1; j < this->size; j++) {
                 swap((*this)(i, j), (*this)(j, i));
         }
     }
@@ -332,7 +332,7 @@ Matrix4 &Matrix4::transpose() {
 Matrix4 transpose(const Matrix4 &a){
     Matrix4 res = a;
     for (int i = 0; i < a.size; i++) {       
-        for (int j = 0; j < a.size; j++) {
+        for (int j = i + 1; j < a.size; j++) {
                 swap(res(i, j), res(j, i));
         }
     }
@@ -531,7 +531,7 @@ Matrix3 &Matrix3::operator*=(float b)
 
 Matrix3 &Matrix3::transpose() {
     for (int i = 0; i < this->size; i++) {       
-        for (int j = 0; j < this->size; j++) {
+        for (int j = i + 1; j < this->size; j++) {
                 swap((*this)(i, j), (*this)(j, i));
         }
     }
@@ -542,7 +542,7 @@ Matrix3 &Matrix3::transpose() {
 Matrix3 transpose(const Matrix3 &a){
     Matrix3 res = a;
     for (int i = 0; i < a.size; i++) {       
-        for (int j = 0; j < a.size; j++) {
+        for (int j = i + 1; j < a.size; j++) {
                 swap(res(i, j), res(j, i));
         }
     }
@@ -723,3 +723,4 @@ Matrix4 translate_matrix(const vec3 &s_v) {
 
     return res;
 }
+

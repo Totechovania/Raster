@@ -59,6 +59,8 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
 
         }
 
+       
+
         for (int t = 0; t < model.mesh.num_triangles; t++) {
             Vertex c[3];
             for (int k = 0; k < 3; k++)
@@ -123,7 +125,7 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
 
                     float q0 = e1 * c[0].iw;
                     float q1 = e2 * c[1].iw;
-                    float q2 = e2 * c[2].iw;
+                    float q2 = e3 * c[2].iw;
                     s = 1.0f / (q0 + q1 + q2);
                     
                     q0 *= s; 
@@ -138,7 +140,7 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                     vec3 norm_inter = (q0 * c[0].n + q1 * c[1].n + q2 * c[2].n).norm();
 
                     float l_light;
-                    vec3 albedo{1};
+
 
                     if (depth < this->depth_buf[i]) {
                         this->depth_buf[i] = depth;
@@ -185,7 +187,7 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                             if (l_light < 0) l_light = 0;
                             
                             for (int ch = 0; ch < 3; ch++) {
-                                pixels[4 * i + ch] = 255 * l_light * (albedo[ch] * 0.7 + 0.2);
+                                pixels[4 * i + ch] = 255 * l_light * (PSI.albedo[ch] * 0.7 + 0.2);
                             }
 
                             break;

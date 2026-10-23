@@ -104,8 +104,7 @@ int main(int argc, char **argv)
     
     Mesh m = load_obj("resources/Bunny.obj").norm();
     models.push_back(Model(m));
-
-    models.push_back(Model(m));
+    models.push_back(Model(m).scale(vec3(2, 0.8, 1)));
 
     
  
@@ -128,7 +127,7 @@ int main(int argc, char **argv)
 
 
 
-        models[0].rotation[1] += angle_speed * dt;
+        models[0].rotation_v[1] += angle_speed * dt;
         models[0].update_M();
 
         renderer.render_scene(models, modes[mode]);

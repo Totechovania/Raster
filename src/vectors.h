@@ -7,6 +7,9 @@
 
 struct Matrix3;
 struct Matrix4;
+struct vec2;
+struct vec3;
+struct vec4;
 // Минимальный набор векторных типов, нужный утилитам шаблона.
 // Остальную математику (операции над векторами, матрицы) вы пишете сами.
 
@@ -113,6 +116,7 @@ struct vec3: vec_base<vec3, 3>
 
     vec3(float x_v=0, float y_v=0, float z_v=0): x(x_v), y(y_v), z(z_v) {};
 
+    explicit vec3(const vec4 &v4);
 
 };
 
@@ -133,7 +137,7 @@ struct vec4: vec_base<vec4, 4>
 
     vec4(float x_v=0, float y_v=0, float z_v=0, float w_v=0): x(x_v), y(y_v), z(z_v), w(w_v) {};
 
-    vec4(const vec3 &v) {
+    explicit vec4(const vec3 &v) {
         for (int i = 0; i < 3; i++) {
             M[i] = v[i];
         }
@@ -241,7 +245,11 @@ inline float dot(const V & a, const V &b) {
 
 vec3 cross(const vec3 & a, const vec3 &b);
 
-
+inline vec3::vec3(const vec4 &v4) {
+    for (int i = 0; i < 3; i++) {
+        M[i] = v4[i];
+    }
+}
 
 
 

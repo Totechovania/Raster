@@ -25,20 +25,30 @@ enum class RENDER_MODE{
 
 
 struct PixelShaderInfo{
+    //depth filrter
     float max_depth_cur;
     float min_depth_cur;
     float max_depth_pr;
     float min_depth_pr;
     
+    
+    //lambert
     vec3 light_direction;
+    vec3 albedo = vec3(1);
+    
+    
 
     PixelShaderInfo() {
+        //depth filrter
         max_depth_cur = -1;
         min_depth_cur = 1;
 
-        light_direction = -vec3(1, -1).norm();
+        //lambert
+        light_direction = vec3(0, 0, 1).norm();
+        albedo = vec3(1);
     };
 
+    //depth filrter
     void
     reset_depth() {
         min_depth_pr = min_depth_cur;
@@ -48,6 +58,7 @@ struct PixelShaderInfo{
         min_depth_cur = 1;
     }
 
+    //depth filrter
     void 
     update_depth(float d) {
         if (d > max_depth_cur) {

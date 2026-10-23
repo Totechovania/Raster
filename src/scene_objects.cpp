@@ -39,9 +39,34 @@ Matrix4 Camera::look_at(vec3 eye, vec3 target, vec3 up)
 }
 
 Matrix4 Model::update_M() {
-    this->M = translate_matrix(this->translation) * rotation_matrix(this->rotation) * scale_matrix(this->scale);
+    this->M = translate_matrix(this->translation_v) * rotation_matrix(this->rotation_v) * scale_matrix(this->scale_v);
 
-    iMt = Matrix3(M).inverse().transpose();
+    iMt =  Matrix3(M).inverse().transpose();
 
+    
     return this->M;
+}
+
+Model &Model::scale(vec3 scale_v)
+{
+    this->scale_v = scale_v;
+    update_M();
+
+    return *this;
+}
+
+Model &Model::rotate(vec3 rotation_v)
+{
+    this->rotation_v = rotation_v;
+    update_M();
+
+    return *this;
+}
+
+Model &Model::translate(vec3 translation_v)
+{
+    this->translation_v = translation_v;
+    update_M();
+
+    return *this;
 }
