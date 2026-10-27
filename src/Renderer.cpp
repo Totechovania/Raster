@@ -3,6 +3,12 @@
 
 #include <stdio.h>
 
+
+static inline float edge_func(const vec3 &v1, const vec3 &v2, const vec3 &p)
+{
+    return (v2.x - v1.x) * (p.y - v1.y) - (v2.y - v1.y) * (p.x - v1.x);
+};
+
 Renderer::Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, int vert_buf_size)
     : pixels(pixels), fb_width(fb_width), fb_height(fb_height), PSI(), cam()
 {
@@ -29,7 +35,7 @@ void Renderer::reset() {
         }
 
         for (size_t i = 0; i < n_pixels; i++) {
-            this->depth_buf[i] = INFINITY; //?
+            this->depth_buf[i] = INFINITY; 
         }
 
 }
@@ -39,14 +45,11 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
 
     Matrix4 VP = this->P * this->cam.V;
 
-    auto p2scr = [this](vec3 p) {
-        return vec3((p.x + 1) * 0.5 * (fb_width-1), (p.y + 1) * 0.5 * (fb_height-1), p.z);
-    };
-
 
     PSI.reset_depth();
     for (Model &model: models) {
         PSI.model = &model;
+
 
         Matrix4 MVP = VP * model.M;
         
@@ -59,7 +62,9 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
 
             if (model.mesh.has_uv_co) {
                 vert_buf[i].ts =  model.mesh.tcs[i];
-            } 
+            } else {
+                vert_buf[i].ts = vec2();
+            }
         }
 
        
@@ -76,7 +81,11 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
 
             if (c[0].co.z >= c[0].w || c[1].co.z >= c[1].w || c[2].co.z >= c[2].w)
                 continue;
-
+            
+            
+            auto p2scr = [this](vec3 p) {
+                return vec3((p.x + 1) * 0.5 * (fb_width-1), (p.y + 1) * 0.5 * (fb_height-1), p.z);
+            };
                 
             for (int k = 0; k < 3; k++) {
                 c[k].iw = 1 / c[k].w;
@@ -112,43 +121,65 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
         if (p_y_max >= fb_height) p_y_max = fb_height - 1;
         if (p_y_min < 0) p_y_min = 0;
 
+
+        vec3 start_p = vec3(p_x_min, p_y_min);
+
+        float e1_row = edge_func(v2.co, v3.co, start_p);
+        float de1_row = v3.co.x - v2.co.x;
+        float de1_col = -(v3.co.y - v2.co.y);
+
+        float e2_row = edge_func(v3.co, v1.co, start_p);
+        float de2_row = v1.co.x - v3.co.x;
+        float de2_col = -(v1.co.y - v3.co.y);
+
+        float e3_row = edge_func(v1.co, v2.co, start_p);
+        float de3_row = v2.co.x - v1.co.x;
+        float de3_col = -(v2.co.y - v1.co.y);
+
+        float n_e = 1.f /(e1_row + e2_row + e3_row);
+
         for (int row = p_y_min; row < p_y_max + 1; row++) {
+
+            float e1 = e1_row;
+            float e2 = e2_row;
+            float e3 = e3_row;
+
             for (int col = p_x_min; col < p_x_max + 1; col++) {
-                vec3 p_co = vec3(col, row);
-                
-                float e1 = edge_func(v2.co, v3.co, p_co); 
-                float e2 = edge_func(v3.co, v1.co, p_co); 
-                float e3 = edge_func(v1.co, v2.co, p_co); 
+             
 
                 if (e1 > 0 && e2 > 0 && e3 >0) {
-                    float s = 1.f /(e1 + e2 + e3);
-                    e1 *= s;
-                    e2 *= s;
-                    e3 *= s;
 
-                    float q0 = e1 * c[0].iw;
-                    float q1 = e2 * c[1].iw;
-                    float q2 = e3 * c[2].iw;
-                    s = 1.0f / (q0 + q1 + q2);
+
+                   
                     
-                    q0 *= s; 
-                    q1 *= s; 
-                    q2 *= s;
+                    float n_e1 = e1 * n_e;
+                    float n_e2 = e2 * n_e;
+                    float n_e3 = e3 * n_e;
 
-                        
+                    float depth = c[0].co.z * n_e1 + c[1].co.z * n_e2 +  c[2].co.z * n_e3;
 
                     int i = row * fb_width + col;
-                    float depth = c[0].co.z * e1 + c[1].co.z * e2 +  c[2].co.z * e3;
-
-                    vec3 norm_inter = (q0 * c[0].n + q1 * c[1].n + q2 * c[2].n).norm();
-                    vec2 uv{q0 * c[0].ts.x + q1 * c[1].ts.x + q2 * c[2].ts.x, q0 * c[0].ts.y + q1 * c[1].ts.y + q2 * c[2].ts.y};
-
-                    float l_light;
-
 
                     if (depth < this->depth_buf[i]) {
                         this->depth_buf[i] = depth;
-                      
+                        
+                        float q0 = n_e1 * c[0].iw;
+                        float q1 = n_e2 * c[1].iw;
+                        float q2 = n_e3 * c[2].iw;
+
+                        float s = 1.0f / (q0 + q1 + q2);
+                        
+                        q0 *= s; 
+                        q1 *= s; 
+                        q2 *= s;
+
+                        
+                        
+
+                        vec3 norm_inter = (q0 * c[0].n + q1 * c[1].n + q2 * c[2].n).norm();
+                        vec2 uv{q0 * c[0].ts.x + q1 * c[1].ts.x + q2 * c[2].ts.x, q0 * c[0].ts.y + q1 * c[1].ts.y + q2 * c[2].ts.y};
+
+                        float l_light;
 
                         switch (mode)
                         {
@@ -212,8 +243,17 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                     }
 
                 }
-
+                
+                e1 += de1_col; 
+                e2 += de2_col; 
+                e3 += de3_col; 
             }
+
+            e1_row += de1_row;
+            e2_row += de2_row;
+            e3_row += de3_row;
+        
+
         }
 }
 

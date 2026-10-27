@@ -36,7 +36,6 @@ struct PixelShaderInfo{
     vec3 light_direction;
     Model *model;
     
-    
 
     PixelShaderInfo() {
         //depth filrter
