@@ -17,13 +17,13 @@ Renderer::Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, 
         vec3(0, 1, 0));
 
     this->depth_buf.resize((size_t)fb_width * fb_height);
-    this->vert_buf.resize(vert_buf_size); //todo    
+    this->vert_buf.resize(vert_buf_size);  
     this->update_P_pers();
 
 }
 
 
-void Renderer::reset() {
+inline void Renderer::reset() {
     const size_t n_pixels = (size_t)fb_width * fb_height;
 
     for (size_t i = 0; i < n_pixels; i++)
@@ -40,7 +40,22 @@ void Renderer::reset() {
 
 }
 
-void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
+void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode)
+{
+                
+    switch (mode) {
+        case RENDER_MODE::WHITE:        render_scene_impl<RENDER_MODE::WHITE>        (models); break;
+        case RENDER_MODE::RGB_TRINAGLE: render_scene_impl<RENDER_MODE::RGB_TRINAGLE> (models); break;
+        case RENDER_MODE::DEPTH:        render_scene_impl<RENDER_MODE::DEPTH>        (models); break;
+        case RENDER_MODE::NORMALS:      render_scene_impl<RENDER_MODE::NORMALS>      (models); break;
+        case RENDER_MODE::LAMBERT:      render_scene_impl<RENDER_MODE::LAMBERT>      (models); break;
+        case RENDER_MODE::UV:           render_scene_impl<RENDER_MODE::UV>           (models); break;
+    }
+            
+}
+
+template <RENDER_MODE mode>
+inline void Renderer::render_scene_impl(std::vector<Model> &models) {
     this->reset();
 
     Matrix4 VP = this->P * this->cam.V;
@@ -91,16 +106,15 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
                 c[k].iw = 1 / c[k].w;
                 c[k].co = p2scr(c[k].co * c[k].iw);
             }
- 
 
-
-            rasterize_triangle(c, mode);
+            rasterize_triangle<mode>(c);
         }
     }
 
 }
 
-void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
+template<RENDER_MODE mode>
+inline void Renderer::rasterize_triangle(Vertex *c) {
 
         
         Vertex &v1 = c[0];
@@ -136,6 +150,9 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
         float de3_row = v2.co.x - v1.co.x;
         float de3_col = -(v2.co.y - v1.co.y);
 
+
+        if (std::abs(e1_row + e2_row + e3_row) < 1e-7) return;
+
         float n_e = 1.f /(e1_row + e2_row + e3_row);
 
         for (int row = p_y_min; row < p_y_max + 1; row++) {
@@ -163,38 +180,19 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                     if (depth < this->depth_buf[i]) {
                         this->depth_buf[i] = depth;
                         
-                        float q0 = n_e1 * c[0].iw;
-                        float q1 = n_e2 * c[1].iw;
-                        float q2 = n_e3 * c[2].iw;
-
-                        float s = 1.0f / (q0 + q1 + q2);
-                        
-                        q0 *= s; 
-                        q1 *= s; 
-                        q2 *= s;
 
                         
-                        
-
-                        vec3 norm_inter = (q0 * c[0].n + q1 * c[1].n + q2 * c[2].n).norm();
-                        vec2 uv{q0 * c[0].ts.x + q1 * c[1].ts.x + q2 * c[2].ts.x, q0 * c[0].ts.y + q1 * c[1].ts.y + q2 * c[2].ts.y};
-
-                        float l_light;
-
-                        switch (mode)
-                        {
-                        case RENDER_MODE::WHITE:
+                        if constexpr (mode == RENDER_MODE::WHITE ) {
                             pixels[4 * i + 0] = 255;
                             pixels[4 * i + 1] = 255;
                             pixels[4 * i + 2] = 255;
-                            break;
-                        case RENDER_MODE::RGB_TRINAGLE:
-                            pixels[4 * i + 0] = 255 * e1;
-                            pixels[4 * i + 1] = 255 * e2;
-                            pixels[4 * i + 2] = 255 * e3;
-                            break;
-
-                        case RENDER_MODE::DEPTH:
+                        }
+                        else if constexpr (mode == RENDER_MODE::RGB_TRINAGLE ) {
+                            pixels[4 * i + 0] = 255 * n_e1;
+                            pixels[4 * i + 1] = 255 * n_e2;
+                            pixels[4 * i + 2] = 255 * n_e3;
+                        }
+                        else if constexpr (mode == RENDER_MODE::DEPTH ) {
                             PSI.update_depth(depth);
                             float color;
                             if (std::abs(PSI.max_depth_pr - PSI.min_depth_pr) > 1e-10) {
@@ -206,39 +204,51 @@ void inline Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                             pixels[4 * i + 0] = color;
                             pixels[4 * i + 1] = color;
                             pixels[4 * i + 2] = color;
-                            break;
-
-                        case RENDER_MODE::NORMALS:
-
-                            for (int ch = 0; ch < 3; ch++) {
-                                pixels[4 * i + ch] = 255 * 0.5 * (norm_inter[ch]  + 1);
-                            }
-
-                            break;
-                        
-                        case RENDER_MODE::LAMBERT:
-                            l_light = dot(norm_inter, PSI.light_direction);
-                            if (l_light > 1) l_light = 1;
-                            if (l_light < 0) l_light = 0;
-                            
-                            for (int ch = 0; ch < 3; ch++) {
-                                pixels[4 * i + ch] = 255 * PSI.model->get_texture(uv.x, uv.y, ch) * (l_light * 0.85 + 0.15);
-                            }
-
-                            break;
-
-                        case RENDER_MODE::UV:
-                            pixels[4 * i + 0] = 255 * uv.x;
-                            pixels[4 * i + 1] = 255 * uv.y;
-
-                            break;
-
-                        default:
-                            break;
                         }
 
-                    
+                        else {
 
+                            float q0 = n_e1 * c[0].iw;
+                            float q1 = n_e2 * c[1].iw;
+                            float q2 = n_e3 * c[2].iw;
+
+                            float s = 1.0f / (q0 + q1 + q2);
+                            
+                            q0 *= s; 
+                            q1 *= s; 
+                            q2 *= s;
+                            
+
+                            vec3 norm_inter = (q0 * c[0].n + q1 * c[1].n + q2 * c[2].n).norm();
+                            vec2 uv{q0 * c[0].ts.x + q1 * c[1].ts.x + q2 * c[2].ts.x, q0 * c[0].ts.y + q1 * c[1].ts.y + q2 * c[2].ts.y};
+
+                            float l_light;
+
+                            if constexpr (mode == RENDER_MODE::NORMALS ) {
+
+                                for (int ch = 0; ch < 3; ch++) {
+                                    pixels[4 * i + ch] = 255 * 0.5 * (norm_inter[ch]  + 1);
+                                }
+
+                            }
+                            
+                            else if constexpr (mode == RENDER_MODE::LAMBERT ) {
+                                l_light = dot(norm_inter, PSI.light_direction);
+                                if (l_light > 1) l_light = 1;
+                                if (l_light < 0) l_light = 0;
+                                
+                                for (int ch = 0; ch < 3; ch++) {
+                                    pixels[4 * i + ch] = 255 * PSI.model->get_texture(uv.x, uv.y, ch) * (l_light * 0.85 + 0.15);
+                                }
+
+                            }
+
+                            else if constexpr (mode == RENDER_MODE::UV ) {
+                                pixels[4 * i + 0] = 255 * uv.x;
+                                pixels[4 * i + 1] = 255 * uv.y;
+
+                            }
+                        }
                         
                     }
 
@@ -273,3 +283,12 @@ void Renderer::update_P_pers(float fov, float n, float f) {
     this->P(3, 2) = -1;
 
 };
+
+
+template void Renderer::render_scene_impl<RENDER_MODE::WHITE>(std::vector<Model>&);
+template void Renderer::render_scene_impl<RENDER_MODE::RGB_TRINAGLE>(std::vector<Model>&);
+template void Renderer::render_scene_impl<RENDER_MODE::DEPTH>(std::vector<Model>&);
+template void Renderer::render_scene_impl<RENDER_MODE::NORMALS>(std::vector<Model>&);
+template void Renderer::render_scene_impl<RENDER_MODE::LAMBERT>(std::vector<Model>&);
+template void Renderer::render_scene_impl<RENDER_MODE::UV>(std::vector<Model>&);
+

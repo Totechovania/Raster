@@ -94,9 +94,13 @@ struct Renderer{
 
     void reset();
 
-    void render_scene(std::vector<Model> &models, RENDER_MODE mode = RENDER_MODE::WHITE);
+    template <RENDER_MODE mode>
+    void render_scene_impl(std::vector<Model> &models);
 
-    void rasterize_triangle(Vertex *c, RENDER_MODE mode);
+    template <RENDER_MODE mode>
+    void rasterize_triangle(Vertex *c);
+ 
+    void render_scene(std::vector<Model> &models, RENDER_MODE mode = RENDER_MODE::WHITE);
 
     void update_P_pers(float fov = 3.14 / 2, float n = 0.01, float f = 10);
 };

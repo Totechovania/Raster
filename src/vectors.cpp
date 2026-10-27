@@ -22,19 +22,6 @@ vec4 operator*(const Matrix4 &m, const vec4 &v) {
 
     return res;
 }
-vec3 operator*(const Matrix3 &m, const vec3 &v)
-{
-    vec3 res;
-
-    for (int i = 0; i < 3; i++) {
-        res[i] = 0;
-        for (int j = 0; j < 3; j++) {
-            res[i] += m(i, j) * v[j];
-        }
-    }
-
-    return res;;
-};
 
 Matrix4::Matrix4(const Matrix3 m3) {
     for (int i = 0; i < 3; i++) {

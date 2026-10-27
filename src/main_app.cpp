@@ -101,14 +101,23 @@ int main(int argc, char **argv)
 
     std::vector<Model> models;
 
-    
-    Mesh m = Mesh("resources/Bunny.obj");
-    models.push_back(Model(m, "resources/textures/porcelain.jpg", 640, 480));
-    models.push_back(Model(m).scale(vec3(2, 0.8, 1)).translate(vec3(0, 0, -0.3)));
+    Mesh b = Mesh("resources/Bunny.obj");
+    Mesh m = Mesh("resources/Roman Centurion.obj");
 
+    models.push_back(Model(b, "resources/textures/porcelain.jpg", 640, 480).scale(vec3(1, 1, 1)));
     
+    Model c = Model(m).scale(vec3(2, 0.8, 1)).translate(vec3(-1, 1, 0));
+    c.base_color = vec3(1, 1, 1);
+    models.push_back(c);
+    models.push_back(Model(m).translate(vec3(1, -1)).scale(vec3(0.3, 0.3, 0.3)));
  
-    Renderer renderer = Renderer(pixels, fb_width, fb_height, m.num_vertices);
+
+    int buf_size = 0;
+    for (auto model: models) {
+        buf_size = std::max(model.mesh.num_vertices, buf_size);
+    }
+
+    Renderer renderer = Renderer(pixels, fb_width, fb_height, buf_size);
     renderer.PSI.light_direction = vec3(0, 1, 1).norm(); 
 
     double prev_time = glfwGetTime();
