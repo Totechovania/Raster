@@ -155,6 +155,8 @@ inline void Renderer::rasterize_triangle(Vertex *c) {
 
         float n_e = 1.f /(e1_row + e2_row + e3_row);
 
+        if (n_e < 0) return;
+
         for (int row = p_y_min; row < p_y_max + 1; row++) {
 
             float e1 = e1_row;

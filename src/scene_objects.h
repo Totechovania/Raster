@@ -32,6 +32,9 @@ struct Model {
 
     Matrix4 M;
     Matrix3 iMt;
+
+    int id;
+
     
     bool has_texture;
     std::vector<float> texture;
