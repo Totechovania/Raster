@@ -139,16 +139,16 @@ inline void Renderer::rasterize_triangle(Vertex *c) {
         vec3 start_p = vec3(p_x_min, p_y_min);
 
         float e1_row = edge_func(v2.co, v3.co, start_p);
-        float de1_row = v3.co.x - v2.co.x;
-        float de1_col = -(v3.co.y - v2.co.y);
+        const float de1_row = v3.co.x - v2.co.x;
+        const float de1_col = -(v3.co.y - v2.co.y);
 
         float e2_row = edge_func(v3.co, v1.co, start_p);
-        float de2_row = v1.co.x - v3.co.x;
-        float de2_col = -(v1.co.y - v3.co.y);
+        const float de2_row = v1.co.x - v3.co.x;
+        const float de2_col = -(v1.co.y - v3.co.y);
 
         float e3_row = edge_func(v1.co, v2.co, start_p);
-        float de3_row = v2.co.x - v1.co.x;
-        float de3_col = -(v2.co.y - v1.co.y);
+        const float de3_row = v2.co.x - v1.co.x;
+        const float de3_col = -(v2.co.y - v1.co.y);
 
 
         if (std::abs(e1_row + e2_row + e3_row) < 1e-7) return;
@@ -157,30 +157,53 @@ inline void Renderer::rasterize_triangle(Vertex *c) {
 
         if (n_e < 0) return;
 
+
+        
+
+        float depth;
+        const float z0 = c[0].co.z, z1 = c[1].co.z, z2 = c[2].co.z;
+        const float d_depth_col = n_e * (z0*de1_col + z1*de2_col + z2*de3_col);
+
+
         for (int row = p_y_min; row < p_y_max + 1; row++) {
 
             float e1 = e1_row;
             float e2 = e2_row;
             float e3 = e3_row;
 
+            bool inside = false;
+            bool entered = false;
+
+            float n_e1, n_e2, n_e3;
+
+            int i = row * fb_width + p_x_min;
+
             for (int col = p_x_min; col < p_x_max + 1; col++) {
-             
+                
 
                 if (e1 > 0 && e2 > 0 && e3 >0) {
 
+                    entered = true;
+                    if (!inside) {
+                        n_e1 = e1 * n_e;
+                        n_e2 = e2 * n_e;
+                        n_e3 = e3 * n_e;
 
-                   
-                    
-                    float n_e1 = e1 * n_e;
-                    float n_e2 = e2 * n_e;
-                    float n_e3 = e3 * n_e;
+                        depth = z0*n_e1 + z1*n_e2 + z2*n_e3;
+                    }
 
-                    float depth = c[0].co.z * n_e1 + c[1].co.z * n_e2 +  c[2].co.z * n_e3;
 
-                    int i = row * fb_width + col;
 
                     if (depth < this->depth_buf[i]) {
                         this->depth_buf[i] = depth;
+                        
+                        
+                        if (inside) { 
+                            n_e1 = e1*n_e; 
+                            n_e2 = e2*n_e; 
+                            n_e3 = e3*n_e; 
+                        }
+                        inside = true;
                         
 
                         
@@ -254,17 +277,24 @@ inline void Renderer::rasterize_triangle(Vertex *c) {
                         
                     }
 
+                depth += d_depth_col;
+
+                } else if (entered) {
+                    break;
                 }
+
+                
                 
                 e1 += de1_col; 
                 e2 += de2_col; 
                 e3 += de3_col; 
+
+                i++;
             }
 
             e1_row += de1_row;
             e2_row += de2_row;
             e3_row += de3_row;
-        
 
         }
 }
