@@ -1,6 +1,4 @@
 #include "Renderer.h"
-
-
 #include <stdio.h>
 
 
@@ -40,22 +38,9 @@ inline void Renderer::reset() {
 
 }
 
-void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode)
-{
-                
-    switch (mode) {
-        case RENDER_MODE::WHITE:        render_scene_impl<RENDER_MODE::WHITE>        (models); break;
-        case RENDER_MODE::RGB_TRINAGLE: render_scene_impl<RENDER_MODE::RGB_TRINAGLE> (models); break;
-        case RENDER_MODE::DEPTH:        render_scene_impl<RENDER_MODE::DEPTH>        (models); break;
-        case RENDER_MODE::NORMALS:      render_scene_impl<RENDER_MODE::NORMALS>      (models); break;
-        case RENDER_MODE::LAMBERT:      render_scene_impl<RENDER_MODE::LAMBERT>      (models); break;
-        case RENDER_MODE::UV:           render_scene_impl<RENDER_MODE::UV>           (models); break;
-    }
-            
-}
 
-template <RENDER_MODE mode>
-inline void Renderer::render_scene_impl(std::vector<Model> &models) {
+
+void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
     this->reset();
 
     Matrix4 VP = this->P * this->cam.V;
@@ -107,14 +92,13 @@ inline void Renderer::render_scene_impl(std::vector<Model> &models) {
                 c[k].co = p2scr(c[k].co * c[k].iw);
             }
 
-            rasterize_triangle<mode>(c);
+            rasterize_triangle(c, mode);
         }
     }
 
 }
 
-template<RENDER_MODE mode>
-inline void Renderer::rasterize_triangle(Vertex *c) {
+inline void Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
 
         
         Vertex &v1 = c[0];
@@ -206,73 +190,69 @@ inline void Renderer::rasterize_triangle(Vertex *c) {
                         inside = true;
                         
 
-                        
-                        if constexpr (mode == RENDER_MODE::WHITE ) {
-                            pixels[4 * i + 0] = 255;
-                            pixels[4 * i + 1] = 255;
-                            pixels[4 * i + 2] = 255;
-                        }
-                        else if constexpr (mode == RENDER_MODE::RGB_TRINAGLE ) {
-                            pixels[4 * i + 0] = 255 * n_e1;
-                            pixels[4 * i + 1] = 255 * n_e2;
-                            pixels[4 * i + 2] = 255 * n_e3;
-                        }
-                        else if constexpr (mode == RENDER_MODE::DEPTH ) {
-                            PSI.update_depth(depth);
-                            float color;
-                            if (std::abs(PSI.max_depth_pr - PSI.min_depth_pr) > 1e-10) {
-                                color = 255 * ((1 - (depth - PSI.min_depth_pr) / (PSI.max_depth_pr - PSI.min_depth_pr)) * 0.7  + 0.2);
-                            } else {
-                                color = 255 * 0.7;
-                            }
-                            
-                            pixels[4 * i + 0] = color;
-                            pixels[4 * i + 1] = color;
-                            pixels[4 * i + 2] = color;
-                        }
+                        switch (mode) {
+                            case RENDER_MODE::WHITE: {
+                                pixels[4 * i + 0] = 255;
+                                pixels[4 * i + 1] = 255;
+                                pixels[4 * i + 2] = 255;
+                            } break;
 
-                        else {
+                            case RENDER_MODE::RGB_TRINAGLE: {
+                                pixels[4 * i + 0] = 255 * n_e1;
+                                pixels[4 * i + 1] = 255 * n_e2;
+                                pixels[4 * i + 2] = 255 * n_e3;
+                            } break;
 
-                            float q0 = n_e1 * c[0].iw;
-                            float q1 = n_e2 * c[1].iw;
-                            float q2 = n_e3 * c[2].iw;
-
-                            float s = 1.0f / (q0 + q1 + q2);
-                            
-                            q0 *= s; 
-                            q1 *= s; 
-                            q2 *= s;
-                            
-
-                            vec3 norm_inter = (q0 * c[0].n + q1 * c[1].n + q2 * c[2].n).norm();
-                            vec2 uv{q0 * c[0].ts.x + q1 * c[1].ts.x + q2 * c[2].ts.x, q0 * c[0].ts.y + q1 * c[1].ts.y + q2 * c[2].ts.y};
-
-                            float l_light;
-
-                            if constexpr (mode == RENDER_MODE::NORMALS ) {
-
-                                for (int ch = 0; ch < 3; ch++) {
-                                    pixels[4 * i + ch] = 255 * 0.5 * (norm_inter[ch]  + 1);
+                            case RENDER_MODE::DEPTH: {
+                                PSI.update_depth(depth);
+                                float color;
+                                if (std::abs(PSI.max_depth_pr - PSI.min_depth_pr) > 1e-10) {
+                                    color = 255 * ((1 - (depth - PSI.min_depth_pr) / (PSI.max_depth_pr - PSI.min_depth_pr)) * 0.7  + 0.2);
+                                } else {
+                                    color = 255 * 0.7;
                                 }
-
-                            }
-                            
-                            else if constexpr (mode == RENDER_MODE::LAMBERT ) {
-                                l_light = dot(norm_inter, PSI.light_direction);
-                                if (l_light > 1) l_light = 1;
-                                if (l_light < 0) l_light = 0;
                                 
-                                for (int ch = 0; ch < 3; ch++) {
-                                    pixels[4 * i + ch] = 255 * PSI.model->get_texture(uv.x, uv.y, ch) * (l_light * 0.85 + 0.15);
+                                pixels[4 * i + 0] = color;
+                                pixels[4 * i + 1] = color;
+                                pixels[4 * i + 2] = color;
+                            } break;
+
+                            case RENDER_MODE::NORMALS:
+                            case RENDER_MODE::LAMBERT:
+                            case RENDER_MODE::UV: {
+                                float q0 = n_e1 * c[0].iw;
+                                float q1 = n_e2 * c[1].iw;
+                                float q2 = n_e3 * c[2].iw;
+
+                                float s = 1.0f / (q0 + q1 + q2);
+                                
+                                q0 *= s; 
+                                q1 *= s; 
+                                q2 *= s;
+                                
+
+                                vec3 norm_inter = (q0 * c[0].n + q1 * c[1].n + q2 * c[2].n).norm();
+                                vec2 uv{q0 * c[0].ts.x + q1 * c[1].ts.x + q2 * c[2].ts.x, q0 * c[0].ts.y + q1 * c[1].ts.y + q2 * c[2].ts.y};
+
+                                if (mode == RENDER_MODE::NORMALS) {
+                                    for (int ch = 0; ch < 3; ch++) {
+                                        pixels[4 * i + ch] = 255 * 0.5 * (norm_inter[ch]  + 1);
+                                    }
                                 }
-
-                            }
-
-                            else if constexpr (mode == RENDER_MODE::UV ) {
-                                pixels[4 * i + 0] = 255 * uv.x;
-                                pixels[4 * i + 1] = 255 * uv.y;
-
-                            }
+                                else if (mode == RENDER_MODE::LAMBERT) {
+                                    float l_light = dot(norm_inter, PSI.light_direction);
+                                    if (l_light > 1) l_light = 1;
+                                    if (l_light < 0) l_light = 0;
+                                    
+                                    for (int ch = 0; ch < 3; ch++) {
+                                        pixels[4 * i + ch] = 255 * PSI.model->get_texture(uv.x, uv.y, ch) * (l_light * 0.85 + 0.15);
+                                    }
+                                }
+                                else { // RENDER_MODE::UV
+                                    pixels[4 * i + 0] = 255 * uv.x;
+                                    pixels[4 * i + 1] = 255 * uv.y;
+                                }
+                            } break;
                         }
                         
                     }
@@ -315,12 +295,3 @@ void Renderer::update_P_pers(float fov, float n, float f) {
     this->P(3, 2) = -1;
 
 };
-
-
-template void Renderer::render_scene_impl<RENDER_MODE::WHITE>(std::vector<Model>&);
-template void Renderer::render_scene_impl<RENDER_MODE::RGB_TRINAGLE>(std::vector<Model>&);
-template void Renderer::render_scene_impl<RENDER_MODE::DEPTH>(std::vector<Model>&);
-template void Renderer::render_scene_impl<RENDER_MODE::NORMALS>(std::vector<Model>&);
-template void Renderer::render_scene_impl<RENDER_MODE::LAMBERT>(std::vector<Model>&);
-template void Renderer::render_scene_impl<RENDER_MODE::UV>(std::vector<Model>&);
-

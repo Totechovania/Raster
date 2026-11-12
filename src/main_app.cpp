@@ -171,4 +171,4 @@ int main(int argc, char **argv)
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
-}
+}void render_scene(std::vector<Model> &models, RENDER_MODE mode = RENDER_MODE::WHITE);
