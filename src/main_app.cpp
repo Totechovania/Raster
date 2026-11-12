@@ -171,7 +171,7 @@ int main(int argc, char **argv)
     glfwSetCursorPosCallback(window, cursor_callback);
 
     const float mouse_sensitivity = 0.0025f;
-    const float pitch_limit       = 3.12 / 2;
+    const float pitch_limit       = 3.12f / 2;
 
 
     while (!glfwWindowShouldClose(window))
@@ -181,7 +181,7 @@ int main(int argc, char **argv)
         prev_time = now;
 
 
-
+        // camera
         vec3 f = (cam.target - cam.eye).norm();
         vec3 r = cross(f, cam.up).norm();
         vec3 move = vec3(0);
@@ -201,7 +201,6 @@ int main(int argc, char **argv)
         HInfo.mouse.dy = 0;
         HInfo.mouse.dx = 0;
 
-
         f = vec3(cosf(cam.pitch) * cosf(cam.yaw),
             sinf(cam.pitch),
             cosf(cam.pitch) * sinf(cam.yaw));
@@ -211,17 +210,18 @@ int main(int argc, char **argv)
         }
 
         cam.pitch  = std::clamp(cam.pitch, -pitch_limit, pitch_limit);
-        if (cam.yaw >  3.14159f) cam.yaw -= 2.0f * 3.14159f;
-        if (cam.yaw < -3.14159f) cam.yaw += 2.0f * 3.14159f;
-        
-
+        if (cam.yaw >  3.14f) cam.yaw -= 2 * 3.14f;
+        if (cam.yaw < -3.14f) cam.yaw += 2 * 3.14f;
 
         cam.look_at(cam.eye + move, cam.eye + f + move, cam.up);
 
 
+        // models
         models[0].rotation_v[1] += angle_speed * dt;
         models[0].update_M();
 
+
+        // actual rendering
         renderer.render_scene(models, HInfo.modes[HInfo.mode]);
 
 
