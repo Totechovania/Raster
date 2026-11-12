@@ -43,13 +43,27 @@ static void hue_to_rgb(float hue, float rgb[3])
     rgb[2] = clamp01(2.0f - fabsf(h - 4.0f));
 }
 
+struct {
+    //mode swith
+    RENDER_MODE modes[4] = { RENDER_MODE::LAMBERT, RENDER_MODE::DEPTH, RENDER_MODE::NORMALS, RENDER_MODE::UV,};
+    int modes_size = sizeof(modes) / sizeof(RENDER_MODE);
+    int mode = 0;
 
-RENDER_MODE modes[] = { RENDER_MODE::LAMBERT, RENDER_MODE::DEPTH, RENDER_MODE::NORMALS, RENDER_MODE::UV,};
-int modes_size = sizeof(modes) / sizeof(RENDER_MODE);
-int mode = 0;
+    //mouse
+    struct {
+        float dx = 0;
+        float dy = 0;
+        float last_x = 0;
+        float last_y = 0;
+        bool first = true;
+    } mouse;
+    
+
+} HInfo;
+
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_M && action == GLFW_PRESS) {
-        mode = (mode + 1) % modes_size;
+        HInfo.mode = (HInfo.mode + 1) % HInfo.modes_size;
     }
 
     if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
@@ -58,6 +72,19 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     
 }
 
+static void cursor_callback(GLFWwindow* w, double x, double y) {
+    if (HInfo.mouse.first) {
+        HInfo.mouse.last_x = x;
+        HInfo.mouse.last_y = y;
+        HInfo.mouse.first  = false;
+        return;
+    }
+
+    HInfo.mouse.dx += (float)(x - HInfo.mouse.last_x);
+    HInfo.mouse.dy += (float)(y - HInfo.mouse.last_y);
+    HInfo.mouse.last_x = x;
+    HInfo.mouse.last_y = y;
+}
 
 
 int main(int argc, char **argv)
@@ -138,6 +165,15 @@ int main(int argc, char **argv)
 
     glfwSetKeyCallback(window, key_callback);
 
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    glfwSetCursorPosCallback(window, cursor_callback);
+
+    const float mouse_sensitivity = 0.0025f;
+    const float pitch_limit       = 3.12 / 2;
+
+
     while (!glfwWindowShouldClose(window))
     {
         const double now = glfwGetTime();
@@ -157,16 +193,36 @@ int main(int argc, char **argv)
 
         if (move.len() > 1e-6f) {
             move = move.norm() * cam_speed * dt;
-            cam.look_at(cam.eye + move, cam.target + move, cam.up);
+            
         }
 
+        cam.pitch -= HInfo.mouse.dy * mouse_sensitivity;
+        cam.yaw += HInfo.mouse.dx * mouse_sensitivity;
+        HInfo.mouse.dy = 0;
+        HInfo.mouse.dx = 0;
 
+
+        f = vec3(cosf(cam.pitch) * cosf(cam.yaw),
+            sinf(cam.pitch),
+            cosf(cam.pitch) * sinf(cam.yaw));
+
+        if (f.len() > 1e-6) {
+            f.norm();
+        }
+
+        cam.pitch  = std::clamp(cam.pitch, -pitch_limit, pitch_limit);
+        if (cam.yaw >  3.14159f) cam.yaw -= 2.0f * 3.14159f;
+        if (cam.yaw < -3.14159f) cam.yaw += 2.0f * 3.14159f;
+        
+
+
+        cam.look_at(cam.eye + move, cam.eye + f + move, cam.up);
 
 
         models[0].rotation_v[1] += angle_speed * dt;
         models[0].update_M();
 
-        renderer.render_scene(models, modes[mode]);
+        renderer.render_scene(models, HInfo.modes[HInfo.mode]);
 
 
 

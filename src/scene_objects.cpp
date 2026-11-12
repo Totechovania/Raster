@@ -1,6 +1,14 @@
 #include "scene_objects.h"
 
-Matrix4 Camera::update_V() {
+void Camera::sync_angles()
+{
+    vec3 f = (target - eye).norm();
+    pitch = asinf(std::clamp(f.y, -1.0f, 1.0f));
+    yaw   = atan2f(f.z, f.x); 
+}
+
+Matrix4 Camera::update_V()
+{
     vec3 z_c = (this->eye - this->target).norm();
     vec3 x_c = cross(this->up, z_c).norm();
     vec3 y_c = cross(z_c, x_c);

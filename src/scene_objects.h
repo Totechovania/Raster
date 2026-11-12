@@ -2,6 +2,7 @@
 #include "mesh_utils.h"
 #include "image_utils.h"
 #include <stdint.h>
+#include <algorithm>
 
 
 struct Camera {
@@ -10,11 +11,20 @@ struct Camera {
     vec3 up;
     Matrix4 V;
 
+    float pitch;
+    float yaw;
+
     Camera(vec3 eye = vec3(0, 0, 1),
          vec3 target = vec3(0, 0, 0), 
          vec3 up = vec3(0, 1, 0)): eye(eye), target(target), up(up) {
+
+        
+        this->sync_angles();
         this->update_V();
     };
+
+    void
+    sync_angles();
 
     Matrix4 update_V();
 
