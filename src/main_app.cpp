@@ -124,7 +124,10 @@ int main(int argc, char **argv)
     }
 
     Renderer renderer = Renderer(pixels, fb_width, fb_height, buf_size);
-    renderer.PSI.light_direction = vec3(0, 1, 1).norm(); 
+    renderer.PSI.light_direction = vec3(0, 1, 1).norm();
+    
+    Camera &cam = renderer.cam;
+    float cam_speed = 1;
 
     double prev_time = glfwGetTime();
     double report_time = prev_time;
@@ -143,6 +146,23 @@ int main(int argc, char **argv)
 
 
 
+        vec3 f = (cam.target - cam.eye).norm();
+        vec3 r = cross(f, cam.up).norm();
+        vec3 move = vec3(0);
+
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) move = move + f;
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) move = move - f;
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) move = move - r;
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) move = move + r;
+
+        if (move.len() > 1e-6f) {
+            move = move.norm() * cam_speed * dt;
+            cam.look_at(cam.eye + move, cam.target + move, cam.up);
+        }
+
+
+
+
         models[0].rotation_v[1] += angle_speed * dt;
         models[0].update_M();
 
@@ -158,7 +178,7 @@ int main(int argc, char **argv)
         const double elapsed = glfwGetTime() - report_time;
         if (elapsed >= 1.0)
         {
-            
+
 
             printf("frame time: %.3f ms (%.1f FPS)\n",
                    1000.0 * elapsed / report_frames, report_frames / elapsed);
@@ -171,4 +191,4 @@ int main(int argc, char **argv)
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
-}void render_scene(std::vector<Model> &models, RENDER_MODE mode = RENDER_MODE::WHITE);
+}

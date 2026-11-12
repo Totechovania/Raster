@@ -76,12 +76,13 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
 
             
 
-            if (std::abs(c[0].w) < this->near || std::abs(c[1].w) < this->near || std::abs(c[2].w) < this->near)
+            if (c[0].w < this->near || c[1].w < this->near || c[2].w < this->near)
                 continue;
+
 
             if (c[0].co.z >= c[0].w || c[1].co.z >= c[1].w || c[2].co.z >= c[2].w)
                 continue;
-            
+
             
             auto p2scr = [this](vec3 p) {
                 return vec3((p.x + 1) * 0.5 * (fb_width-1), (p.y + 1) * 0.5 * (fb_height-1), p.z);
