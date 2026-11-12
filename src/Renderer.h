@@ -11,7 +11,6 @@ struct Vertex {
     float iw;
     vec3 n;
     vec2 ts;
-    vec3 color;
 };
 
 enum class RENDER_MODE{
@@ -95,7 +94,7 @@ struct Renderer{
     void reset();
 
     void render_scene(std::vector<Model> &models, RENDER_MODE mode = RENDER_MODE::WHITE);
-    void rasterize_triangle(Vertex *c, RENDER_MODE mode);
+    void rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, RENDER_MODE mode);
  
     
 

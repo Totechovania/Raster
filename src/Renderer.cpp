@@ -38,7 +38,39 @@ inline void Renderer::reset() {
 
 }
 
+inline Vertex lerp_vertex(const Vertex& a, const Vertex& b, float t) {
+    Vertex res;
 
+    res.co = a.co * (1.0f - t) + b.co * t;
+
+    res.w  = a.w  * (1.0f - t) + b.w  * t;
+
+    res.n  = (a.n  * (1.0f - t) + b.n  * t).norm();
+
+    res.ts = a.ts * (1.0f - t) + b.ts * t;
+
+    return res;
+}
+
+inline int clip_near(const Vertex in[3], Vertex out[4]) {
+    int n = 0;
+    for (int i = 0; i < 3; ++i) {
+        const Vertex& a = in[i];
+        const Vertex& b = in[(i + 1) % 3];
+
+        float da = a.co.z + a.w;
+        float db = b.co.z + b.w;
+
+        if (da >= 0.0f) out[n++] = a;
+
+        if ((da >= 0.0f) != (db >= 0.0f)) {
+            float t = da / (da - db);  
+            out[n++] = lerp_vertex(a, b, t);
+        }
+    }
+
+    return n; 
+}
 
 void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
     this->reset();
@@ -76,7 +108,7 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
 
             
 
-            if (c[0].w < this->near || c[1].w < this->near || c[2].w < this->near)
+            if (c[0].w < this->near && c[1].w < this->near && c[2].w < this->near)
                 continue;
 
 
@@ -88,23 +120,26 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
                 return vec3((p.x + 1) * 0.5 * (fb_width-1), (p.y + 1) * 0.5 * (fb_height-1), p.z);
             };
                 
-            for (int k = 0; k < 3; k++) {
-                c[k].iw = 1 / c[k].w;
-                c[k].co = p2scr(c[k].co * c[k].iw);
+            
+
+            Vertex cliped[4];
+            int n = clip_near(c, cliped);
+
+            for (int k = 0; k < n; k++) {
+                cliped[k].iw = 1 / cliped[k].w;
+                cliped[k].co = p2scr(cliped[k].co * cliped[k].iw);
             }
 
-            rasterize_triangle(c, mode);
+            if (n == 4) rasterize_triangle(cliped[0], cliped[2], cliped[3], mode);
+            rasterize_triangle(cliped[0], cliped[1], cliped[2], mode);
         }
     }
 
 }
 
-inline void Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
+inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, RENDER_MODE mode) {
 
-        
-        Vertex &v1 = c[0];
-        Vertex &v2 = c[1];
-        Vertex &v3 = c[2];
+    
         
 
         int p_x_max, p_x_min, p_y_max, p_y_min;
@@ -146,7 +181,7 @@ inline void Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
         
 
         float depth;
-        const float z0 = c[0].co.z, z1 = c[1].co.z, z2 = c[2].co.z;
+        const float z0 = v1.co.z, z1 = v2.co.z, z2 = v3.co.z;
         const float d_depth_col = n_e * (z0*de1_col + z1*de2_col + z2*de3_col);
 
 
@@ -221,9 +256,9 @@ inline void Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                             case RENDER_MODE::NORMALS:
                             case RENDER_MODE::LAMBERT:
                             case RENDER_MODE::UV: {
-                                float q0 = n_e1 * c[0].iw;
-                                float q1 = n_e2 * c[1].iw;
-                                float q2 = n_e3 * c[2].iw;
+                                float q0 = n_e1 * v1.iw;
+                                float q1 = n_e2 * v2.iw;
+                                float q2 = n_e3 * v3.iw;
 
                                 float s = 1.0f / (q0 + q1 + q2);
                                 
@@ -232,8 +267,8 @@ inline void Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                                 q2 *= s;
                                 
 
-                                vec3 norm_inter = (q0 * c[0].n + q1 * c[1].n + q2 * c[2].n).norm();
-                                vec2 uv{q0 * c[0].ts.x + q1 * c[1].ts.x + q2 * c[2].ts.x, q0 * c[0].ts.y + q1 * c[1].ts.y + q2 * c[2].ts.y};
+                                vec3 norm_inter = (q0 * v1.n + q1 * v2.n + q2 * v3.n).norm();
+                                vec2 uv{q0 * v1.ts.x + q1 * v2.ts.x + q2 * v3.ts.x, q0 * v1.ts.y + q1 * v2.ts.y + q2 * v3.ts.y};
 
                                 if (mode == RENDER_MODE::NORMALS) {
                                     for (int ch = 0; ch < 3; ch++) {
@@ -249,7 +284,7 @@ inline void Renderer::rasterize_triangle(Vertex *c, RENDER_MODE mode) {
                                         pixels[4 * i + ch] = 255 * PSI.model->get_texture(uv.x, uv.y, ch) * (l_light * 0.85 + 0.15);
                                     }
                                 }
-                                else { // RENDER_MODE::UV
+                                else if (mode == RENDER_MODE::UV){ 
                                     pixels[4 * i + 0] = 255 * uv.x;
                                     pixels[4 * i + 1] = 255 * uv.y;
                                 }
