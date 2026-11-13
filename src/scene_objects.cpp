@@ -46,7 +46,7 @@ Matrix4 Camera::look_at(vec3 eye, vec3 target, vec3 up)
     return this->update_V();
 }
 
-float Model::texture_at(int x, int y, int ch) {
+vec3 Model::texture_at(int x, int y) {
    
 
 
@@ -57,13 +57,13 @@ float Model::texture_at(int x, int y, int ch) {
     if (y >= t_shape.h) y = t_shape.h - 1;
 
     if (has_texture) {
-        return texture[(y*t_shape.w + x)*3 + ch];
+        return texture[y*t_shape.w + x];
     }
 
-    return base_color[ch];
+    return base_color;
 }
 
-float Model::get_texture(float x, float y, int ch)
+vec3 Model::get_texture(float x, float y)
 {
    
     if (has_texture && t_shape.w != 0 && t_shape.h != 0) {
@@ -77,17 +77,19 @@ float Model::get_texture(float x, float y, int ch)
         float a = x - std::floor(x);
         float b = y - std::floor(y);
 
-        float c = (1 - a) * (1 - b) * texture_at(x - a, y - b, ch) + 
-                (a) * (1 - b) * texture_at(x - a + 1, y - b, ch) + 
-                (1 - a) * (b) * texture_at(x - a, y - b + 1, ch) + 
-                (a) * (b) * texture_at(x - a + 1, y - b + 1, ch);
+        vec3 c = (1 - a) * (1 - b) * texture_at(x - a, y - b) + 
+                (a) * (1 - b) * texture_at(x - a + 1, y - b) + 
+                (1 - a) * (b) * texture_at(x - a, y - b + 1) + 
+                (a) * (b) * texture_at(x - a + 1, y - b + 1);
 
-        if (c < 0) c = 0;
-        if (c > 1) c = 1;
+        
+
+        //if (c < 0) c = 0;
+        //if (c > 1) c = 1;
         
         return c;
     } else {
-        return base_color[ch];
+        return base_color;
     }
 }
 

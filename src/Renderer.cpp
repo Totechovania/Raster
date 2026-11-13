@@ -24,17 +24,11 @@ Renderer::Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, 
 inline void Renderer::reset() {
     const size_t n_pixels = (size_t)fb_width * fb_height;
 
-    for (size_t i = 0; i < n_pixels; i++)
-        {
-            pixels[4 * i + 0] = 0;
-            pixels[4 * i + 1] = 0;
-            pixels[4 * i + 2] = 0;
-            pixels[4 * i + 3] = 255;
-        }
+    std::fill(depth_buf.begin(), depth_buf.end(),
+              std::numeric_limits<float>::infinity());
 
-        for (size_t i = 0; i < n_pixels; i++) {
-            this->depth_buf[i] = INFINITY; 
-        }
+    uint32_t* p32 = reinterpret_cast<uint32_t*>(pixels.data());
+    std::fill(p32, p32 + (size_t)fb_width * fb_height, 0xFF000000u);
 
 }
 
@@ -279,9 +273,12 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
                                     float l_light = dot(norm_inter, PSI.light_direction);
                                     if (l_light > 1) l_light = 1;
                                     if (l_light < 0) l_light = 0;
+
+
+                                    vec3 color = PSI.model->get_texture(uv.x, uv.y) * (255 * (l_light * 0.85 + 0.15));
                                     
                                     for (int ch = 0; ch < 3; ch++) {
-                                        pixels[4 * i + ch] = 255 * PSI.model->get_texture(uv.x, uv.y, ch) * (l_light * 0.85 + 0.15);
+                                        pixels[4 * i + ch] = color[ch];
                                     }
                                 }
                                 else if (mode == RENDER_MODE::UV){ 

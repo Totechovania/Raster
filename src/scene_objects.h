@@ -3,6 +3,7 @@
 #include "image_utils.h"
 #include <stdint.h>
 #include <algorithm>
+#include <cstring>
 
 
 struct Camera {
@@ -47,7 +48,7 @@ struct Model {
 
     
     bool has_texture;
-    std::vector<float> texture;
+    std::vector<vec3> texture;
     struct 
     {
         int h;
@@ -63,8 +64,8 @@ struct Model {
         rotation_v = vec3();
         translation_v = vec3();
 
-        texture = load_image_f32_rgb(texture_file, &w, &h, gamma); 
-        if (texture.size() == 0) {
+        std::vector<float> texture_img = load_image_f32_rgb(texture_file, &w, &h, gamma); 
+        if (texture_img.size() == 0) {
             has_texture = false;
             t_shape.h = 0;
             t_shape.w = 0;
@@ -73,6 +74,9 @@ struct Model {
             
             t_shape.h = h;
             t_shape.w = w;
+
+            texture.resize(w * h);
+            std::memcpy(texture.data(), texture_img.data(), w * h * 3 * sizeof(float));
         }
 
         base_color = vec3(1);
@@ -80,9 +84,9 @@ struct Model {
         update_M();
     };
 
-    float texture_at(int x, int y, int ch);
+    vec3 texture_at(int x, int y);
 
-    float get_texture(float x, float y, int ch);
+    vec3 get_texture(float x, float y);
 
     Matrix4 update_M();
 
