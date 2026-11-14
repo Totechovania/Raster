@@ -84,8 +84,6 @@ struct Model {
         update_M();
     };
 
-    vec3 texture_at(int x, int y);
-
     vec3 get_texture(float x, float y);
 
     Matrix4 update_M();

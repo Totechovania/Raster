@@ -4,6 +4,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <math.h>
+#include <stdint.h>
+#include <algorithm>
 
 struct Matrix3;
 struct Matrix4;
@@ -248,7 +250,9 @@ inline float dot(const V & a, const V &b) {
     return res;
 }
 
-vec3 cross(const vec3 & a, const vec3 &b);
+void bilinear_inter(const uint8_t *src, int w, int h, float x, float y, uint8_t *res);
+
+vec3 cross(const vec3 &a, const vec3 &b);
 
 inline vec3::vec3(const vec4 &v4) {
     for (int i = 0; i < 3; i++) {

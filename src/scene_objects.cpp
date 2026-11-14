@@ -46,46 +46,38 @@ Matrix4 Camera::look_at(vec3 eye, vec3 target, vec3 up)
     return this->update_V();
 }
 
-vec3 Model::texture_at(int x, int y) {
-   
-
-
-    if (x < 0) x = 0;
-    if (x >= t_shape.w) x = t_shape.w - 1;
-
-    if (y < 0) y = 0;
-    if (y >= t_shape.h) y = t_shape.h - 1;
-
-    if (has_texture) {
-        return texture[y*t_shape.w + x];
-    }
-
-    return base_color;
-}
-
 vec3 Model::get_texture(float x, float y)
 {
    
     if (has_texture && t_shape.w != 0 && t_shape.h != 0) {
-        x = x - std::floor(x);
-        y = y - std::floor(y);
-        x = 1 - x;
 
-        x = t_shape.w * x - 0.5f;
-        y = t_shape.h * y - 0.5f;
+        x -= std::floor(x);
+        y -= std::floor(y);
 
-        float a = x - std::floor(x);
-        float b = y - std::floor(y);
+        x = x * t_shape.w - 0.5f;
+        y = y * t_shape.h - 0.5f;
 
-        vec3 c = (1 - a) * (1 - b) * texture_at(x - a, y - b) + 
-                (a) * (1 - b) * texture_at(x - a + 1, y - b) + 
-                (1 - a) * (b) * texture_at(x - a, y - b + 1) + 
-                (a) * (b) * texture_at(x - a + 1, y - b + 1);
+        int x0 = (int)std::floor(x);
+        int y0 = (int)std::floor(y);
+        float fx = x - x0;
+        float fy = y - y0;
 
-        
+        int x1 = x0 + 1, y1 = y0 + 1;
+        x0 = std::clamp(x0, 0, t_shape.w - 1); 
+        x1 = std::clamp(x1, 0, t_shape.w - 1);
+        y0 = std::clamp(y0, 0, t_shape.h - 1); 
+        y1 = std::clamp(y1, 0, t_shape.h - 1);
 
-        //if (c < 0) c = 0;
-        //if (c > 1) c = 1;
+
+        float w00 = (1 - fx) * (1 - fy);
+        float w10 = fx       * (1 - fy);
+        float w01 = (1 - fx) * fy;
+        float w11 = fx       * fy;
+
+        vec3 c = w00 * texture[y0 * t_shape.w + x0]
+            + w10 * texture[y0 * t_shape.w + x1]
+            + w01 * texture[y1 * t_shape.w + x0]
+            + w11 * texture[y1 * t_shape.w + x1];
         
         return c;
     } else {

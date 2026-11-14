@@ -3,6 +3,41 @@
 
 
 
+void
+bilinear_inter(const uint8_t* src, int w, int h, float x, float y, uint8_t *res)
+{
+    x -= std::floor(x);
+    y -= std::floor(y);
+
+    x = x * w - 0.5f;
+    y = y * h - 0.5f;
+
+    int x0 = (int)std::floor(x);
+    int y0 = (int)std::floor(y);
+    float fx = x - x0;
+    float fy = y - y0;
+
+    int x1 = x0 + 1, y1 = y0 + 1;
+    x0 = std::clamp(x0, 0, w - 1); 
+    x1 = std::clamp(x1, 0, w - 1);
+    y0 = std::clamp(y0, 0, h - 1); 
+    y1 = std::clamp(y1, 0, h - 1);
+
+    const uint8_t* p00 = src + (y0 * w + x0) * 4;
+    const uint8_t* p10 = src + (y0 * w + x1) * 4;
+    const uint8_t* p01 = src + (y1 * w + x0) * 4;
+    const uint8_t* p11 = src + (y1 * w + x1) * 4;
+
+    float w00 = (1 - fx) * (1 - fy);
+    float w10 = fx       * (1 - fy);
+    float w01 = (1 - fx) * fy;
+    float w11 = fx       * fy;
+
+    for (int c = 0; c < 4; ++c)
+        res[c] = (uint8_t)(w00 * p00[c] + w10 * p10[c] +
+                           w01 * p01[c] + w11 * p11[c] + 0.5f);
+}
+
 
 
 

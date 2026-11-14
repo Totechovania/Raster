@@ -86,16 +86,37 @@ static void cursor_callback(GLFWwindow* w, double x, double y) {
     HInfo.mouse.last_y = y;
 }
 
+enum class ResolutionMode{
+        NO_SCALE,
+        INT_SCALE,
+        DIM_SCALE,
+};
 
 int main(int argc, char **argv)
 {
-    const int width = argc > 1 ? atoi(argv[1]) : 640;
-    const int height = argc > 2 ? atoi(argv[2]) : 480;
-    if (argc > 3 || width <= 0 || height <= 0)
+    int r_width = argc > 1 ? atoi(argv[1]) : 640;
+    int r_height = argc > 2 ? atoi(argv[2]) : 480;
+
+    const float scale = (argc == 4) ? atof(argv[3]) : 0;
+
+    int width = argc > 4 ? atoi(argv[3]) : 640;
+    int height = argc > 4 ? atoi(argv[4]) : 480;
+
+    if (argc > 5 || width <= 0 || height <= 0)
     {
-        printf("Usage: %s [width] [height]\n", argv[0]);
+        printf("Usage: %s [r_width] [r_height] [width] [height] \n", argv[0]);
         return 1;
+    } 
+
+    
+
+    if (scale > 0) { 
+        width = std::ceil(r_width * scale);
+        height = std::ceil(r_height * scale);
+
     }
+
+   
 
     glfwSetErrorCallback(glfw_error_callback);
     if (!glfwInit())
@@ -122,10 +143,42 @@ int main(int argc, char **argv)
     glfwGetFramebufferSize(window, &fb_width, &fb_height);
 
     // RGBA8, строки снизу вверх: первая строка буфера - нижняя строка окна
-    const size_t n_pixels = (size_t)fb_width * fb_height;
-    std::vector<uint8_t> pixels;
-    pixels.resize(4 * n_pixels);
+    const size_t n_window_pixels = (size_t)fb_width * fb_height;
+    std::vector<uint8_t> window_pixels;
+    window_pixels.resize(4 * n_window_pixels);
 
+    //resolution_mode
+    ResolutionMode resolution_mode = ResolutionMode::NO_SCALE;
+
+    const size_t n_render_pixels = (size_t)r_width * r_height;
+    std::vector<uint8_t> render_pixels;
+    render_pixels.resize(n_render_pixels * 4);
+
+    int int_scale = (int) scale;
+    if ( width == r_width && height == r_height) {
+         resolution_mode = ResolutionMode::NO_SCALE;
+    } else if (width == int_scale * r_width && height == int_scale * r_height) {
+        resolution_mode = ResolutionMode::INT_SCALE;
+    } else {
+        resolution_mode = ResolutionMode::DIM_SCALE;
+    } 
+
+    std::cout << (int) resolution_mode << "\n";
+
+    //input handeling
+    glfwSetKeyCallback(window, key_callback);
+
+
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    glfwSetCursorPosCallback(window, cursor_callback);
+
+    const float mouse_sensitivity = 0.0025f;
+    const float pitch_limit       = 3.12f / 2;
+
+    
+
+    // scene creation
     std::vector<Model> models;
 
     Mesh b = Mesh("resources/Bunny.obj");
@@ -150,7 +203,10 @@ int main(int argc, char **argv)
         buf_size = std::max(model.mesh.num_vertices, buf_size);
     }
 
-    Renderer renderer = Renderer(pixels, fb_width, fb_height, buf_size);
+    
+    //renderer
+
+    Renderer renderer = Renderer(render_pixels, r_width, r_height, buf_size);
     renderer.PSI.light_direction = vec3(0, 1, 1).norm();
     
     Camera &cam = renderer.cam;
@@ -163,17 +219,7 @@ int main(int argc, char **argv)
     float angle_speed = 3.14 / 5;
 
 
-    glfwSetKeyCallback(window, key_callback);
-
-
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetInputMode(window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-    glfwSetCursorPosCallback(window, cursor_callback);
-
-    const float mouse_sensitivity = 0.0025f;
-    const float pitch_limit       = 3.12f / 2;
-
-
+    // main loop
     while (!glfwWindowShouldClose(window))
     {
         const double now = glfwGetTime();
@@ -224,12 +270,51 @@ int main(int argc, char **argv)
         // actual rendering
         renderer.render_scene(models, HInfo.modes[HInfo.mode]);
 
+        //upscaling
+        if (resolution_mode == ResolutionMode::NO_SCALE) {
+            glDrawPixels(fb_width, fb_height, GL_RGBA, GL_UNSIGNED_BYTE, render_pixels.data());
+
+        } else if (resolution_mode == ResolutionMode::INT_SCALE) {
+            std::vector<uint32_t> expanded_row(fb_width);
+
+            for (int y = 0; y < r_height; ++y) {
+                const uint32_t* src_row = reinterpret_cast<const uint32_t*>(
+                    render_pixels.data() + (size_t)y * r_width * 4);
+
+                for (int x = 0; x < r_width; ++x) {
+                    for (int s = 0; s < int_scale; ++s) {
+                        expanded_row[x * int_scale + s] = src_row[x];
+                    } 
+                }
+
+                for (int s = 0; s < int_scale; ++s) {
+                    size_t dst_offset = ((size_t)(y * int_scale + s) * fb_width) * 4;
+
+                    std::memcpy(window_pixels.data() + dst_offset,
+                                expanded_row.data(),
+                                (size_t)fb_width * 4);
+                }
+            }
+
+            glDrawPixels(fb_width, fb_height, GL_RGBA, GL_UNSIGNED_BYTE, window_pixels.data());
+        } else if (resolution_mode == ResolutionMode::DIM_SCALE) { 
+            
+            uint8_t out[4];
+            for (int y = 0; y < fb_height; y++) {
+                for (int x = 0; x < fb_width; x++) {
+                    bilinear_inter(render_pixels.data(), r_width, r_height, (x + 0.5f) / fb_width, (y + 0.5f) / fb_height, out);
+                    std::memcpy(window_pixels.data() + (y*fb_width + x) * 4, out, 4);
+                }
+            }
 
 
-        glDrawPixels(fb_width, fb_height, GL_RGBA, GL_UNSIGNED_BYTE, pixels.data());
+            glDrawPixels(fb_width, fb_height, GL_RGBA, GL_UNSIGNED_BYTE, window_pixels.data());
+        }
+        
         glfwSwapBuffers(window);
         glfwPollEvents();
 
+        //framerate
         report_frames++;
         const double elapsed = glfwGetTime() - report_time;
         if (elapsed >= 1.0)
