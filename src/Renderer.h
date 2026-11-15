@@ -19,7 +19,9 @@ enum class RENDER_MODE{
     DEPTH,
     NORMALS,
     UV,
-    LAMBERT
+    LAMBERT,
+    MIP_LEVELS_DEPTH,
+    MIP_LEVELS_DER,
 };
 
 
@@ -66,6 +68,9 @@ struct PixelShaderInfo{
         }
 
     }
+
+    //test
+    bool flag = true;
 };
 
 struct Renderer{
@@ -80,6 +85,11 @@ struct Renderer{
     int &fb_height;
 
     float near;
+    float far;
+    float log_n;
+    float log_f;
+    float i_log_fn;
+    
     Matrix4 P;
 
     PixelShaderInfo PSI;
@@ -94,9 +104,11 @@ struct Renderer{
     void reset();
 
     void render_scene(std::vector<Model> &models, RENDER_MODE mode = RENDER_MODE::WHITE);
-    void rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, RENDER_MODE mode);
- 
-    
+
+
+    float mip_from_depth(float d, int max_mip) const;
+
+    void rasterize_triangle(Vertex &v1, Vertex &v2, Vertex &v3, RENDER_MODE mode);
 
     void update_P_pers(float fov = 3.14 / 2, float n = 0.01, float f = 10);
 };

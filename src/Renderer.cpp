@@ -71,7 +71,6 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
 
     Matrix4 VP = this->P * this->cam.V;
 
-
     PSI.reset_depth();
     for (Model &model: models) {
         PSI.model = &model;
@@ -94,6 +93,8 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
         }
 
        
+
+        
 
         for (int t = 0; t < model.mesh.num_triangles; t++) {
             Vertex c[3];
@@ -129,6 +130,41 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
         }
     }
 
+}
+
+
+inline float Renderer::mip_from_depth(float d, int max_mip) const {
+
+    float t = (log_f + 1 - std::log2((d) * (near + 2 - far) + (near + 2 + far))) * i_log_fn;
+
+    float mip = t * max_mip;
+
+    if (mip < 0)        mip = 0;
+    if (mip > max_mip)  mip = max_mip;
+
+    return mip;
+}
+
+static inline vec3 mip_debug_color(int mip, int max_mip) {
+    // Отображаем уровень в hue: mip=0 → красный (h=0),
+    // mip=max_mip → фиолетовый (h≈0.9). Деление на (max_mip+1)
+    // гарантирует, что последний уровень не совпадёт по цвету с первым.
+    const float h = (float)mip / (float)(max_mip + 1);
+
+    // HSV → RGB при s = 1, v = 1
+    const float h6 = h * 6.0f;
+    const int   i  = (int)h6;
+    const float f  = h6 - (float)i;
+    const float q  = 1.0f - f;
+
+    switch (i % 6) {
+        case 0:  return vec3(1.0f, f,    0.0f);   // R→Y
+        case 1:  return vec3(q,    1.0f, 0.0f);   // Y→G
+        case 2:  return vec3(0.0f, 1.0f, f);      // G→C
+        case 3:  return vec3(0.0f, q,    1.0f);   // C→B
+        case 4:  return vec3(f,    0.0f, 1.0f);   // B→M
+        default: return vec3(1.0f, 0.0f, q);      // M→R
+    }
 }
 
 inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, RENDER_MODE mode) {
@@ -179,6 +215,37 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
         const float d_depth_col = n_e * (z0*de1_col + z1*de2_col + z2*de3_col);
 
 
+
+        float dC_dx;
+        float dC_dy;
+
+        float dP_u_dx;
+        float dP_u_dy;
+        float dP_v_dx;
+        float dP_v_dy;
+        if (mode == RENDER_MODE::MIP_LEVELS_DER) {
+            float dq0_dx = n_e * de1_col * v1.iw;
+            float dq1_dx = n_e * de2_col * v2.iw;
+            float dq2_dx = n_e * de3_col * v3.iw;
+
+            float dq0_dy = n_e * de1_row * v1.iw;
+            float dq1_dy = n_e * de2_row * v2.iw;
+            float dq2_dy = n_e * de3_row * v3.iw;
+
+            int W = PSI.model->t_shape.w;
+            int H = PSI.model->t_shape.h;
+
+            dC_dx = (dq0_dx + dq1_dx + dq2_dx) * W;
+            dC_dy = (dq0_dy + dq1_dy + dq2_dy) * H; 
+
+            dP_u_dx = (dq0_dx * v1.ts.x + dq1_dx * v2.ts.x + dq2_dx * v3.ts.x) * W;
+            dP_u_dy = dq0_dy * v1.ts.x + dq1_dy * v2.ts.x + dq2_dy * v3.ts.x *  W; 
+
+            dP_v_dx = dq0_dx * v1.ts.y + dq1_dx * v2.ts.y + dq2_dx * v3.ts.y * H;
+            dP_v_dy = dq0_dy * v1.ts.y + dq1_dy * v2.ts.y + dq2_dy * v3.ts.y * H;
+        }
+
+
         for (int row = p_y_min; row < p_y_max + 1; row++) {
 
             float e1 = e1_row;
@@ -191,6 +258,7 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
             float n_e1, n_e2, n_e3;
 
             int i = row * fb_width + p_x_min;
+
 
             for (int col = p_x_min; col < p_x_max + 1; col++) {
                 
@@ -247,8 +315,24 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
                                 pixels[4 * i + 2] = color;
                             } break;
 
+                            case RENDER_MODE::MIP_LEVELS_DEPTH: {
+                                const int max_mip = 10;
+
+                                int mip = (int) mip_from_depth(depth, max_mip);
+
+                                vec3 color = mip_debug_color(mip, max_mip);
+
+
+                                pixels[4 * i + 0] = color[0] * 255;
+                                pixels[4 * i + 1] = color[1] * 255;
+                                pixels[4 * i + 2] = color[2] * 255;
+
+
+                            } break;
+
                             case RENDER_MODE::NORMALS:
                             case RENDER_MODE::LAMBERT:
+                            case RENDER_MODE::MIP_LEVELS_DER:
                             case RENDER_MODE::UV: {
                                 float q0 = n_e1 * v1.iw;
                                 float q1 = n_e2 * v2.iw;
@@ -284,6 +368,34 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
                                 else if (mode == RENDER_MODE::UV){ 
                                     pixels[4 * i + 0] = 255 * uv.x;
                                     pixels[4 * i + 1] = 255 * uv.y;
+                                } 
+                                else if (mode == RENDER_MODE::MIP_LEVELS_DER) {
+                                    int max_mip = 10;
+
+
+                                    const float nu_x = dP_u_dx - uv[0] * dC_dx;
+                                    const float nv_x = dP_v_dx - uv[1] * dC_dx;
+                                    const float nu_y = dP_u_dy - uv[0] * dC_dy;
+                                    const float nv_y = dP_v_dy - uv[1] * dC_dy;
+
+                                    const float M = std::max(nu_x*nu_x + nv_x*nv_x,
+                                                            nu_y*nu_y + nv_y*nv_y);
+                                    float lod = 0.5f * log2(M * s * s);
+
+                                    if (lod < 0.0f)                    lod = 0.0f;
+                                    if (lod > (float) max_mip)    lod = (float) max_mip;
+
+                                    const int   m0 = (int)lod;
+                                    const int   m1 = (m0 + 1 < max_mip) ? m0 + 1 : max_mip;
+                                    const float f  = lod - (float)m0;
+                                    //const vec3  c  = model.get_texture(u, v, m0) * (1.0f - f) + model.get_texture(u, v, m1) * f;
+
+                                    const vec3 color = mip_debug_color(m0, max_mip) * (1.0f - f) + mip_debug_color(m1, max_mip) * f;
+
+                                    pixels[4 * i + 0] = color[0] * 255;
+                                    pixels[4 * i + 1] = color[1] * 255;
+                                    pixels[4 * i + 2] = color[2] * 255;
+
                                 }
                             } break;
                         }
@@ -314,7 +426,15 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
 
 void Renderer::update_P_pers(float fov, float n, float f) {
     float a = this->fb_width / (float) this->fb_height;
+
     this->near = n;
+    this->far = f;
+
+    this->log_n = std::log2(this->near);
+    this->log_f = std::log2(this->far);
+    this->i_log_fn = 1 / (log_f - log_n);
+
+
 
     float c = 1 / std::tan(fov /2);
     this->P.fill_zeros();

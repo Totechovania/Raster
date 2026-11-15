@@ -45,7 +45,7 @@ static void hue_to_rgb(float hue, float rgb[3])
 
 struct {
     //mode swith
-    RENDER_MODE modes[4] = { RENDER_MODE::LAMBERT, RENDER_MODE::DEPTH, RENDER_MODE::NORMALS, RENDER_MODE::UV,};
+    RENDER_MODE modes[4] = { RENDER_MODE::LAMBERT, RENDER_MODE::DEPTH, RENDER_MODE::NORMALS, RENDER_MODE::MIP_LEVELS_DER,};
     int modes_size = sizeof(modes) / sizeof(RENDER_MODE);
     int mode = 0;
 
@@ -188,7 +188,7 @@ int main(int argc, char **argv)
     b1.id = 0;
     models.push_back(b1);
     
-    Model m1 = Model(m).scale(vec3(2, 0.8, 1)).translate(vec3(-1, 1, 0));
+    Model m1 = Model(m, "resources/textures/porcelain.jpg", 640, 480).scale(vec3(2, 0.8, 1)).translate(vec3(-1, 1, 0));
     m1.base_color = vec3(1, 1, 1);
     m1.id = 0;
     models.push_back(m1);
