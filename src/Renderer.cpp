@@ -198,8 +198,8 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
                 float v = 0.5f * (tc / ma + 1.0f);
                 v = 1 - v;
 
-                u = std::clamp(u, 0.0f, 1.0f);
-                v = std::clamp(v, 0.0f, 1.0f);
+                u = u - std::floor(u);
+                v = v - std::floor(v);
 
                 vec3 color = src->get_texture(u, v, 0); 
 
