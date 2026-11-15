@@ -216,33 +216,40 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
 
 
 
-        float dC_dx;
-        float dC_dy;
+        float dC_dx_H;
+        float dC_dy_W;
+        float dC_dx_W;
+        float dC_dy_H;
 
         float dP_u_dx;
         float dP_u_dy;
         float dP_v_dx;
         float dP_v_dy;
         if (mode == RENDER_MODE::MIP_LEVELS_DER) {
-            float dq0_dx = n_e * de1_col * v1.iw;
-            float dq1_dx = n_e * de2_col * v2.iw;
-            float dq2_dx = n_e * de3_col * v3.iw;
+            const float dq0_dx = n_e * de1_col * v1.iw;
+            const float dq1_dx = n_e * de2_col * v2.iw;
+            const float dq2_dx = n_e * de3_col * v3.iw;
 
-            float dq0_dy = n_e * de1_row * v1.iw;
-            float dq1_dy = n_e * de2_row * v2.iw;
-            float dq2_dy = n_e * de3_row * v3.iw;
+            const float dq0_dy = n_e * de1_row * v1.iw;
+            const float dq1_dy = n_e * de2_row * v2.iw;
+            const float dq2_dy = n_e * de3_row * v3.iw;
 
             int W = PSI.model->t_shape.w;
             int H = PSI.model->t_shape.h;
 
-            dC_dx = (dq0_dx + dq1_dx + dq2_dx) * W;
-            dC_dy = (dq0_dy + dq1_dy + dq2_dy) * H; 
+            const float dC_dx = (dq0_dx + dq1_dx + dq2_dx);
+            const float dC_dy = (dq0_dy + dq1_dy + dq2_dy); 
+
+            dC_dx_H = dC_dx * H;
+            dC_dx_W = dC_dx * W;
+            dC_dy_H = dC_dy * H;
+            dC_dy_W = dC_dy * W;
 
             dP_u_dx = (dq0_dx * v1.ts.x + dq1_dx * v2.ts.x + dq2_dx * v3.ts.x) * W;
-            dP_u_dy = dq0_dy * v1.ts.x + dq1_dy * v2.ts.x + dq2_dy * v3.ts.x *  W; 
+            dP_u_dy = (dq0_dy * v1.ts.x + dq1_dy * v2.ts.x + dq2_dy * v3.ts.x) *  W; 
 
-            dP_v_dx = dq0_dx * v1.ts.y + dq1_dx * v2.ts.y + dq2_dx * v3.ts.y * H;
-            dP_v_dy = dq0_dy * v1.ts.y + dq1_dy * v2.ts.y + dq2_dy * v3.ts.y * H;
+            dP_v_dx = (dq0_dx * v1.ts.y + dq1_dx * v2.ts.y + dq2_dx * v3.ts.y) * H;
+            dP_v_dy = (dq0_dy * v1.ts.y + dq1_dy * v2.ts.y + dq2_dy * v3.ts.y) * H;
         }
 
 
@@ -373,17 +380,19 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
                                     int max_mip = 10;
 
 
-                                    const float nu_x = dP_u_dx - uv[0] * dC_dx;
-                                    const float nv_x = dP_v_dx - uv[1] * dC_dx;
-                                    const float nu_y = dP_u_dy - uv[0] * dC_dy;
-                                    const float nv_y = dP_v_dy - uv[1] * dC_dy;
+                                    const float nu_x = dP_u_dx - uv[0] * dC_dx_W;
+                                    const float nv_x = dP_v_dx - uv[1] * dC_dx_H;
+                                    const float nu_y = dP_u_dy - uv[0] * dC_dy_W;
+                                    const float nv_y = dP_v_dy - uv[1] * dC_dy_H;
 
                                     const float M = std::max(nu_x*nu_x + nv_x*nv_x,
                                                             nu_y*nu_y + nv_y*nv_y);
-                                    float lod = 0.5f * log2(M * s * s);
+                                    float lod = 0.5f * std::log2f(M * s * s);
 
                                     if (lod < 0.0f)                    lod = 0.0f;
                                     if (lod > (float) max_mip)    lod = (float) max_mip;
+
+                                    //const vec3 color = mip_debug_color( lod, max_mip);
 
                                     const int   m0 = (int)lod;
                                     const int   m1 = (m0 + 1 < max_mip) ? m0 + 1 : max_mip;

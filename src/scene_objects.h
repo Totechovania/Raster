@@ -92,3 +92,14 @@ struct Model {
     Model &rotate(vec3 rotation_v);
     Model &translate(vec3 translation_v);
 };
+
+
+
+struct Texture {
+    
+    int h;
+    int w;
+    int max_mip;
+    std::vector<std::vector<vec3>> textures;
+
+};
