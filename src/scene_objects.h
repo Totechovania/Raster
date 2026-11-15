@@ -33,6 +33,20 @@ struct Camera {
         
 };
 
+struct Texture {
+    
+    int h;
+    int w;
+    int max_mip;
+    std::vector<int> mip_widths;
+    std::vector<int> mip_heights;
+    std::vector<std::vector<vec3>> textures;
+
+    Texture(const char *filename, int w_v, int h_v, float gamma=2.2);
+
+    void generate_mips();
+};
+
 
 struct Model {
     Mesh &mesh;
@@ -46,45 +60,23 @@ struct Model {
 
     int id;
 
-    
-    bool has_texture;
-    std::vector<vec3> texture;
-    struct 
-    {
-        int h;
-        int w;
-    } t_shape;
+    Texture *texture;
     
     vec3 base_color;
 
-    Model(Mesh &mesh, const char *texture_file="", int w=0, int h=0, float gamma=2.2): 
-        mesh(mesh)   
+    Model(Mesh &mesh, Texture *texture=nullptr, int w=0, int h=0): 
+        texture(texture), mesh(mesh)   
     {
         scale_v = vec3(1, 1, 1);
         rotation_v = vec3();
         translation_v = vec3();
-
-        std::vector<float> texture_img = load_image_f32_rgb(texture_file, &w, &h, gamma); 
-        if (texture_img.size() == 0) {
-            has_texture = false;
-            t_shape.h = 0;
-            t_shape.w = 0;
-        } else {
-            has_texture = true;
-            
-            t_shape.h = h;
-            t_shape.w = w;
-
-            texture.resize(w * h);
-            std::memcpy(texture.data(), texture_img.data(), w * h * 3 * sizeof(float));
-        }
 
         base_color = vec3(1);
 
         update_M();
     };
 
-    vec3 get_texture(float x, float y);
+    vec3 get_texture(float x, float y, int mip);
 
     Matrix4 update_M();
 
@@ -95,11 +87,3 @@ struct Model {
 
 
 
-struct Texture {
-    
-    int h;
-    int w;
-    int max_mip;
-    std::vector<std::vector<vec3>> textures;
-
-};

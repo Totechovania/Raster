@@ -46,16 +46,98 @@ Matrix4 Camera::look_at(vec3 eye, vec3 target, vec3 up)
     return this->update_V();
 }
 
-vec3 Model::get_texture(float x, float y)
+
+Texture::Texture(const char *filename, int w_v, int h_v, float gamma)
+{
+    this->w = w_v;
+    this->h = h_v;
+
+    std::vector<float> texture_img = load_image_f32_rgb(filename, &w, &h, gamma); 
+        if (texture_img.size() != 0) {
+            
+
+            textures.resize(1);
+            textures[0].resize(w * h);
+            std::copy_n(reinterpret_cast<const vec3*>(texture_img.data()), w*h, textures[0].data());
+
+            this->generate_mips();
+        } else {
+            this->w = 0;
+            this->h = 0;
+            max_mip = 0;
+        }
+}
+
+void Texture::generate_mips()
+{
+    if (textures.empty() || w <= 0 || h <= 0) {
+        max_mip = 0;
+        return;
+    }
+
+    mip_widths.clear();
+    mip_heights.clear();
+    textures.resize(1); 
+
+    int cur_w = w;
+    int cur_h = h;
+
+    mip_widths.push_back(cur_w);
+    mip_heights.push_back(cur_h);
+
+    while (cur_w > 1 || cur_h > 1) {
+        int next_w = std::max(1, (cur_w + 1) / 2);
+        int next_h = std::max(1, (cur_h + 1) / 2);
+
+        const std::vector<vec3>& src = textures.back();
+        std::vector<vec3> dst(next_w * next_h);
+
+        for (int y = 0; y < next_h; ++y) {
+            for (int x = 0; x < next_w; ++x) {
+                vec3 sum = vec3(0.0f);
+                float cnt = 0.0f;
+
+                for (int dy = 0; dy < 2; ++dy) {
+                    int sy = std::min(y * 2 + dy, cur_h - 1);
+                    for (int dx = 0; dx < 2; ++dx) {
+                        int sx = std::min(x * 2 + dx, cur_w - 1);
+                        sum += src[sy * cur_w + sx];
+                        cnt += 1.0f;
+                    }
+                }
+
+                dst[y * next_w + x] = sum * (1 / cnt);
+            }
+        }
+
+        textures.push_back(std::move(dst));
+        cur_w = next_w;
+        cur_h = next_h;
+
+        mip_widths.push_back(cur_w);
+        mip_heights.push_back(cur_h);
+    }
+
+    max_mip = static_cast<int>(textures.size()) - 1;
+}
+
+vec3 Model::get_texture(float x, float y, int mip)
 {
    
-    if (has_texture && t_shape.w != 0 && t_shape.h != 0) {
+    if ((texture != nullptr) && texture->w > 0 && texture->h > 0) {
+        if (mip < 0) mip = 0;
+        if (mip > texture->max_mip) mip = texture->max_mip; 
+
+        
+        const std::vector<vec3> &src = texture->textures[mip];
+        int W = texture->mip_widths[mip];
+        int H = texture->mip_heights[mip];
 
         x -= std::floor(x);
         y -= std::floor(y);
 
-        x = x * t_shape.w - 0.5f;
-        y = y * t_shape.h - 0.5f;
+        x = x * W - 0.5f;
+        y = y * H - 0.5f;
 
         int x0 = (int)std::floor(x);
         int y0 = (int)std::floor(y);
@@ -63,10 +145,10 @@ vec3 Model::get_texture(float x, float y)
         float fy = y - y0;
 
         int x1 = x0 + 1, y1 = y0 + 1;
-        x0 = std::clamp(x0, 0, t_shape.w - 1); 
-        x1 = std::clamp(x1, 0, t_shape.w - 1);
-        y0 = std::clamp(y0, 0, t_shape.h - 1); 
-        y1 = std::clamp(y1, 0, t_shape.h - 1);
+        x0 = std::clamp(x0, 0, W - 1); 
+        x1 = std::clamp(x1, 0, W - 1);
+        y0 = std::clamp(y0, 0, H - 1); 
+        y1 = std::clamp(y1, 0, H - 1);
 
 
         float w00 = (1 - fx) * (1 - fy);
@@ -74,10 +156,10 @@ vec3 Model::get_texture(float x, float y)
         float w01 = (1 - fx) * fy;
         float w11 = fx       * fy;
 
-        vec3 c = w00 * texture[y0 * t_shape.w + x0]
-            + w10 * texture[y0 * t_shape.w + x1]
-            + w01 * texture[y1 * t_shape.w + x0]
-            + w11 * texture[y1 * t_shape.w + x1];
+        vec3 c = w00 * src[y0 * W + x0]
+            + w10 * src[y0 * W + x1]
+            + w01 * src[y1 * W + x0]
+            + w11 * src[y1 * W + x1];
         
         return c;
     } else {

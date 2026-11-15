@@ -184,11 +184,15 @@ int main(int argc, char **argv)
     Mesh b = Mesh("resources/Bunny.obj");
     Mesh m = Mesh("resources/Roman Centurion.obj");
 
-    Model b1 = Model(b, "resources/textures/porcelain.jpg", 640, 480).scale(vec3(1, 1, 1));
+    Texture porcelain_tx = Texture("resources/textures/porcelain.jpg", 640, 480);
+   
+
+    Model b1 = Model(b, &porcelain_tx).scale(vec3(1, 1, 1));
+    
     b1.id = 0;
     models.push_back(b1);
     
-    Model m1 = Model(m, "resources/textures/porcelain.jpg", 640, 480).scale(vec3(2, 0.8, 1)).translate(vec3(-1, 1, 0));
+    Model m1 = Model(m, &porcelain_tx).scale(vec3(2, 0.8, 1)).translate(vec3(-1, 1, 0));
     m1.base_color = vec3(1, 1, 1);
     m1.id = 0;
     models.push_back(m1);

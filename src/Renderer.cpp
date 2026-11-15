@@ -215,6 +215,7 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
         const float d_depth_col = n_e * (z0*de1_col + z1*de2_col + z2*de3_col);
 
 
+        int max_mip = 0;
 
         float dC_dx_H;
         float dC_dy_W;
@@ -225,31 +226,35 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
         float dP_u_dy;
         float dP_v_dx;
         float dP_v_dy;
-        if (mode == RENDER_MODE::MIP_LEVELS_DER) {
-            const float dq0_dx = n_e * de1_col * v1.iw;
-            const float dq1_dx = n_e * de2_col * v2.iw;
-            const float dq2_dx = n_e * de3_col * v3.iw;
+        if (mode == RENDER_MODE::MIP_LEVELS_DER || mode == RENDER_MODE::LAMBERT) {
+            if (PSI.model->texture != nullptr) {
+                max_mip = PSI.model->texture->max_mip;
 
-            const float dq0_dy = n_e * de1_row * v1.iw;
-            const float dq1_dy = n_e * de2_row * v2.iw;
-            const float dq2_dy = n_e * de3_row * v3.iw;
+                const float dq0_dx = n_e * de1_col * v1.iw;
+                const float dq1_dx = n_e * de2_col * v2.iw;
+                const float dq2_dx = n_e * de3_col * v3.iw;
 
-            int W = PSI.model->t_shape.w;
-            int H = PSI.model->t_shape.h;
+                const float dq0_dy = n_e * de1_row * v1.iw;
+                const float dq1_dy = n_e * de2_row * v2.iw;
+                const float dq2_dy = n_e * de3_row * v3.iw;
 
-            const float dC_dx = (dq0_dx + dq1_dx + dq2_dx);
-            const float dC_dy = (dq0_dy + dq1_dy + dq2_dy); 
+                int W = PSI.model->texture->w;
+                int H = PSI.model->texture->h;
 
-            dC_dx_H = dC_dx * H;
-            dC_dx_W = dC_dx * W;
-            dC_dy_H = dC_dy * H;
-            dC_dy_W = dC_dy * W;
+                const float dC_dx = (dq0_dx + dq1_dx + dq2_dx);
+                const float dC_dy = (dq0_dy + dq1_dy + dq2_dy); 
 
-            dP_u_dx = (dq0_dx * v1.ts.x + dq1_dx * v2.ts.x + dq2_dx * v3.ts.x) * W;
-            dP_u_dy = (dq0_dy * v1.ts.x + dq1_dy * v2.ts.x + dq2_dy * v3.ts.x) *  W; 
+                dC_dx_H = dC_dx * H;
+                dC_dx_W = dC_dx * W;
+                dC_dy_H = dC_dy * H;
+                dC_dy_W = dC_dy * W;
 
-            dP_v_dx = (dq0_dx * v1.ts.y + dq1_dx * v2.ts.y + dq2_dx * v3.ts.y) * H;
-            dP_v_dy = (dq0_dy * v1.ts.y + dq1_dy * v2.ts.y + dq2_dy * v3.ts.y) * H;
+                dP_u_dx = (dq0_dx * v1.ts.x + dq1_dx * v2.ts.x + dq2_dx * v3.ts.x) * W;
+                dP_u_dy = (dq0_dy * v1.ts.x + dq1_dy * v2.ts.x + dq2_dy * v3.ts.x) *  W; 
+
+                dP_v_dx = (dq0_dx * v1.ts.y + dq1_dx * v2.ts.y + dq2_dx * v3.ts.y) * H;
+                dP_v_dy = (dq0_dy * v1.ts.y + dq1_dy * v2.ts.y + dq2_dy * v3.ts.y) * H;
+            }
         }
 
 
@@ -354,6 +359,36 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
 
                                 vec3 norm_inter = (q0 * v1.n + q1 * v2.n + q2 * v3.n).norm();
                                 vec2 uv{q0 * v1.ts.x + q1 * v2.ts.x + q2 * v3.ts.x, q0 * v1.ts.y + q1 * v2.ts.y + q2 * v3.ts.y};
+            
+                                int m0; 
+                                int m1;
+                                float f;
+                                if (mode == RENDER_MODE::LAMBERT || mode == RENDER_MODE::MIP_LEVELS_DER) {
+                                    if (PSI.model->texture != nullptr) {
+                                        const float nu_x = dP_u_dx - uv[0] * dC_dx_W;
+                                        const float nv_x = dP_v_dx - uv[1] * dC_dx_H;
+                                        const float nu_y = dP_u_dy - uv[0] * dC_dy_W;
+                                        const float nv_y = dP_v_dy - uv[1] * dC_dy_H;
+
+                                        const float M = std::max(nu_x*nu_x + nv_x*nv_x,
+                                                                nu_y*nu_y + nv_y*nv_y);
+                                        float lod = 0.5f * std::log2f(M * s * s);
+
+                                        if (lod < 0.0f)                    lod = 0.0f;
+                                        if (lod > (float) max_mip)    lod = (float) max_mip;
+
+
+                                        m0 = (int)lod;
+                                        m1 = (m0 + 1 < max_mip) ? m0 + 1 : max_mip;
+                                        f  = lod - (float)m0;
+                                    } else {
+                                        m0 = 0; 
+                                        m1 = 0;
+                                        f = 0;
+                                    }
+
+                                }
+                                
 
                                 if (mode == RENDER_MODE::NORMALS) {
                                     for (int ch = 0; ch < 3; ch++) {
@@ -365,8 +400,9 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
                                     if (l_light > 1) l_light = 1;
                                     if (l_light < 0) l_light = 0;
 
+                                    vec3 color = PSI.model->get_texture(uv.x, uv.y, m0) * (1.0f - f) + PSI.model->get_texture(uv.x, uv.y, m1) * f;
 
-                                    vec3 color = PSI.model->get_texture(uv.x, uv.y) * (255 * (l_light * 0.85 + 0.15));
+                                    color = color * (255 * (l_light * 0.85 + 0.15));
                                     
                                     for (int ch = 0; ch < 3; ch++) {
                                         pixels[4 * i + ch] = color[ch];
@@ -377,26 +413,6 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
                                     pixels[4 * i + 1] = 255 * uv.y;
                                 } 
                                 else if (mode == RENDER_MODE::MIP_LEVELS_DER) {
-                                    int max_mip = 10;
-
-
-                                    const float nu_x = dP_u_dx - uv[0] * dC_dx_W;
-                                    const float nv_x = dP_v_dx - uv[1] * dC_dx_H;
-                                    const float nu_y = dP_u_dy - uv[0] * dC_dy_W;
-                                    const float nv_y = dP_v_dy - uv[1] * dC_dy_H;
-
-                                    const float M = std::max(nu_x*nu_x + nv_x*nv_x,
-                                                            nu_y*nu_y + nv_y*nv_y);
-                                    float lod = 0.5f * std::log2f(M * s * s);
-
-                                    if (lod < 0.0f)                    lod = 0.0f;
-                                    if (lod > (float) max_mip)    lod = (float) max_mip;
-
-                                    //const vec3 color = mip_debug_color( lod, max_mip);
-
-                                    const int   m0 = (int)lod;
-                                    const int   m1 = (m0 + 1 < max_mip) ? m0 + 1 : max_mip;
-                                    const float f  = lod - (float)m0;
                                     //const vec3  c  = model.get_texture(u, v, m0) * (1.0f - f) + model.get_texture(u, v, m1) * f;
 
                                     const vec3 color = mip_debug_color(m0, max_mip) * (1.0f - f) + mip_debug_color(m1, max_mip) * f;
