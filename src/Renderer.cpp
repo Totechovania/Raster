@@ -130,16 +130,31 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
 
     //skybox
     if (skybox != nullptr) {
-        
-        Matrix4 invVP = inverse(VP);
+
+        vec3 f = (cam.target - cam.eye).norm();       
+        vec3 s = (cross(f, cam.up)).norm();         
+        vec3 u = cross(s, f);
+
+        const float inv_Px  = 1 / P(0, 0);
+        const float inv_Py  = 1 / P(1, 1);
+
+        const float inv_w = 2.0f / fb_width;
+        const float inv_h = 2.0f / fb_height;
+
 
         for (int row = 0; row < fb_height; row++) {
+            float ny = ((row + 0.5f) * inv_h - 1.0f) * inv_Py;
+            vec3 u_ny =  u * ny;
+
             for (int col = 0; col < fb_width; col++) {
                 int i = row * fb_width + col;
 
                 if (depth_buf[i] != INFINITY) continue;
                 //std::cout << "yes" << std::endl;
 
+
+
+                /*
                 float ndc_x = 2.0f * (col + 0.5f) / (float)fb_width  - 1.0f;
                 float ndc_y = 2.0f * (row + 0.5f) / (float)fb_height - 1.0f;
 
@@ -148,6 +163,11 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
                 RA = RA * (1.0f / RA.w);
                 RB = RB * (1.0f / RB.w);
                 vec3 d(RB.x - RA.x, RB.y - RA.y, RB.z - RA.z); 
+                */
+
+                float nx = ((col+ 0.5f) * inv_w - 1.0f) * inv_Px;     
+                    
+                vec3 d = f + s * nx + u_ny;
 
                 float adx = std::abs(d.x), ady = std::abs(d.y), adz = std::abs(d.z);
 
