@@ -22,8 +22,9 @@ Renderer::Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, 
 
 
 inline void Renderer::reset() {
+    constexpr float DEPTH_FAR = 1e30f;
     std::fill(depth_buf.begin(), depth_buf.end(),
-              std::numeric_limits<float>::infinity());
+              DEPTH_FAR);
 
     uint32_t* p32 = reinterpret_cast<uint32_t*>(pixels.data());
     std::fill(p32, p32 + (size_t)fb_width * fb_height, 0xFF000000u);
@@ -128,7 +129,10 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
         }
     }
 
+    
+
     //skybox
+    constexpr float DEPTH_FAR = 1e30f;
     if (skybox != nullptr) {
 
         vec3 f = (cam.target - cam.eye).norm();       
@@ -149,7 +153,7 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
             for (int col = 0; col < fb_width; col++) {
                 int i = row * fb_width + col;
 
-                if (depth_buf[i] != INFINITY) continue;
+                if (depth_buf[i] != DEPTH_FAR) continue;
                 //std::cout << "yes" << std::endl;
 
 
