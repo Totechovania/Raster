@@ -94,12 +94,13 @@ struct Renderer{
 
     PixelShaderInfo PSI;
 
+    Skybox *skybox;
 
     Camera cam;
 
     
 
-    Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, int vert_buf_size);
+    Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, int vert_buf_size, Skybox* skybox=nullptr);
 
     void reset();
 

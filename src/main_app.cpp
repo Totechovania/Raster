@@ -209,8 +209,16 @@ int main(int argc, char **argv)
 
     
     //renderer
+    Texture sky_bk = Texture("resources/textures/skybox/hills_bk.png", 512, 512, true, 1.0f);
+    Texture sky_dn = Texture("resources/textures/skybox/hills_dn.png", 512, 512, true, 1.0f);
+    Texture sky_ft = Texture("resources/textures/skybox/hills_ft.png", 512, 512, true, 1.0f);
+    Texture sky_lf = Texture("resources/textures/skybox/hills_lf.png", 512, 512, true, 1.0f);
+    Texture sky_rt = Texture("resources/textures/skybox/hills_rt.png", 512, 512, true, 1.0f);
+    Texture sky_up = Texture("resources/textures/skybox/hills_up.png", 512, 512, true, 1.0f);
 
-    Renderer renderer = Renderer(render_pixels, r_width, r_height, buf_size);
+    Skybox skybox(&sky_bk, &sky_dn, &sky_ft, &sky_lf, &sky_rt, &sky_up);
+
+    Renderer renderer = Renderer(render_pixels, r_width, r_height, buf_size, &skybox);
     renderer.PSI.light_direction = vec3(0, 1, 1).norm();
     
     Camera &cam = renderer.cam;

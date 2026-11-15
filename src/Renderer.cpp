@@ -5,10 +5,10 @@
 static inline float edge_func(const vec3 &v1, const vec3 &v2, const vec3 &p)
 {
     return (v2.x - v1.x) * (p.y - v1.y) - (v2.y - v1.y) * (p.x - v1.x);
-};
+}; 
 
-Renderer::Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, int vert_buf_size)
-    : pixels(pixels), fb_width(fb_width), fb_height(fb_height), PSI(), cam()
+Renderer::Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, int vert_buf_size, Skybox *skybox)
+    : pixels(pixels), fb_width(fb_width), fb_height(fb_height), PSI(), skybox(skybox), cam()
 {
     cam.look_at(vec3(0, 0, 2),
         vec3(0, 0, 0), 
@@ -22,8 +22,6 @@ Renderer::Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, 
 
 
 inline void Renderer::reset() {
-    const size_t n_pixels = (size_t)fb_width * fb_height;
-
     std::fill(depth_buf.begin(), depth_buf.end(),
               std::numeric_limits<float>::infinity());
 
@@ -128,6 +126,64 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
             if (n == 4) rasterize_triangle(cliped[0], cliped[2], cliped[3], mode);
             rasterize_triangle(cliped[0], cliped[1], cliped[2], mode);
         }
+    }
+
+    //skybox
+    if (skybox != nullptr) {
+        
+        Matrix4 invVP = inverse(VP);
+
+        for (int row = 0; row < fb_height; row++) {
+            for (int col = 0; col < fb_width; col++) {
+                int i = row * fb_width + col;
+
+                if (depth_buf[i] != INFINITY) continue;
+                //std::cout << "yes" << std::endl;
+
+                float ndc_x = 2.0f * (col + 0.5f) / (float)fb_width  - 1.0f;
+                float ndc_y = 2.0f * (row + 0.5f) / (float)fb_height - 1.0f;
+
+                vec4 RA = invVP * vec4(ndc_x, ndc_y, -1.0f, 1.0f);
+                vec4 RB = invVP * vec4(ndc_x, ndc_y, +1.0f, 1.0f);
+                RA = RA * (1.0f / RA.w);
+                RB = RB * (1.0f / RB.w);
+                vec3 d(RB.x - RA.x, RB.y - RA.y, RB.z - RA.z); 
+
+                float adx = std::abs(d.x), ady = std::abs(d.y), adz = std::abs(d.z);
+
+                Texture* src = nullptr;
+                float sc = 0.f, tc = 0.f, ma = 0.f;
+
+                if (adx >= ady && adx >= adz) {
+                    ma = adx;
+                    if (d.x > 0) { src = skybox->rt; sc = -d.z; tc = -d.y; }  // +X
+                    else         { src = skybox->lf; sc = +d.z; tc = -d.y; }  // -X
+                } else if (ady >= adz) {
+                    ma = ady;
+                    if (d.y > 0) { src = skybox->up; sc = -d.x; tc = -d.z; }  // +Y
+                    else         { src = skybox->dn; sc = +d.x; tc = -d.z; }  // -Y
+                } else {
+                    ma = adz;
+                    if (d.z > 0) { src = skybox->bk; sc = +d.x; tc = -d.y; }  // +Z
+                    else         { src = skybox->ft; sc = -d.x; tc = -d.y; }  // -Z
+                }
+
+                if (!src || ma < 1e-6f) continue; 
+
+                float u = 0.5f * (sc / ma + 1.0f);
+                float v = 0.5f * (tc / ma + 1.0f);
+                v = 1 - v;
+
+                u = std::clamp(u, 0.0f, 1.0f);
+                v = std::clamp(v, 0.0f, 1.0f);
+
+                vec3 color = src->get_texture(u, v, 0); 
+
+                pixels[4 * i + 0] = color[0] * 255;
+                pixels[4 * i + 1] = color[1] * 255;
+                pixels[4 * i + 2] = color[2] * 255;
+            }
+        }   
     }
 
 }

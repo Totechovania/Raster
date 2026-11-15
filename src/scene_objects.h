@@ -42,9 +42,10 @@ struct Texture {
     std::vector<int> mip_heights;
     std::vector<std::vector<vec3>> textures;
 
-    Texture(const char *filename, int w_v, int h_v, float gamma=2.2);
+    Texture(const char *filename, int w_v, int h_v, bool mipmaping=true, float gamma=2.2);
 
     void generate_mips();
+    vec3 get_texture(float x, float y, int mip);
 };
 
 
@@ -87,3 +88,17 @@ struct Model {
 
 
 
+struct Skybox {
+
+    Texture *bk; 
+    Texture *dn; 
+    Texture *ft; 
+    Texture *lf; 
+    Texture *rt; 
+    Texture *up;
+    
+    Skybox( Texture *bk, Texture *dn, Texture *ft, Texture *lf, Texture *rt, Texture *up): bk(bk), dn(dn), ft(ft), lf(lf), rt(rt), up(up) {
+
+    }
+
+};

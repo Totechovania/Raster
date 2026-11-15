@@ -47,7 +47,7 @@ Matrix4 Camera::look_at(vec3 eye, vec3 target, vec3 up)
 }
 
 
-Texture::Texture(const char *filename, int w_v, int h_v, float gamma)
+Texture::Texture(const char *filename, int w_v, int h_v, bool mipmaping, float gamma )
 {
     this->w = w_v;
     this->h = h_v;
@@ -60,7 +60,9 @@ Texture::Texture(const char *filename, int w_v, int h_v, float gamma)
             textures[0].resize(w * h);
             std::copy_n(reinterpret_cast<const vec3*>(texture_img.data()), w*h, textures[0].data());
 
-            this->generate_mips();
+            if (mipmaping) this->generate_mips();
+            else max_mip = 0;
+        
         } else {
             this->w = 0;
             this->h = 0;
@@ -121,47 +123,54 @@ void Texture::generate_mips()
     max_mip = static_cast<int>(textures.size()) - 1;
 }
 
+vec3 Texture::get_texture(float x, float y, int mip)
+{
+    if (mip < 0) mip = 0;
+    if (mip > max_mip) mip = max_mip; 
+
+    
+    const std::vector<vec3> &src = textures[mip];
+    int W = mip_widths[mip];
+    int H = mip_heights[mip];
+
+
+    if (W == 0 || H ==0) return vec3();
+
+    x -= std::floor(x);
+    y -= std::floor(y);
+
+    x = x * W - 0.5f;
+    y = y * H - 0.5f;
+
+    int x0 = (int)std::floor(x);
+    int y0 = (int)std::floor(y);
+    float fx = x - x0;
+    float fy = y - y0;
+
+    int x1 = x0 + 1, y1 = y0 + 1;
+    x0 = std::clamp(x0, 0, W - 1); 
+    x1 = std::clamp(x1, 0, W - 1);
+    y0 = std::clamp(y0, 0, H - 1); 
+    y1 = std::clamp(y1, 0, H - 1);
+
+
+    float w00 = (1 - fx) * (1 - fy);
+    float w10 = fx       * (1 - fy);
+    float w01 = (1 - fx) * fy;
+    float w11 = fx       * fy;
+
+    vec3 c = w00 * src[y0 * W + x0]
+        + w10 * src[y0 * W + x1]
+        + w01 * src[y1 * W + x0]
+        + w11 * src[y1 * W + x1];
+
+    return c;
+}
+
 vec3 Model::get_texture(float x, float y, int mip)
 {
-   
     if ((texture != nullptr) && texture->w > 0 && texture->h > 0) {
-        if (mip < 0) mip = 0;
-        if (mip > texture->max_mip) mip = texture->max_mip; 
-
-        
-        const std::vector<vec3> &src = texture->textures[mip];
-        int W = texture->mip_widths[mip];
-        int H = texture->mip_heights[mip];
-
-        x -= std::floor(x);
-        y -= std::floor(y);
-
-        x = x * W - 0.5f;
-        y = y * H - 0.5f;
-
-        int x0 = (int)std::floor(x);
-        int y0 = (int)std::floor(y);
-        float fx = x - x0;
-        float fy = y - y0;
-
-        int x1 = x0 + 1, y1 = y0 + 1;
-        x0 = std::clamp(x0, 0, W - 1); 
-        x1 = std::clamp(x1, 0, W - 1);
-        y0 = std::clamp(y0, 0, H - 1); 
-        y1 = std::clamp(y1, 0, H - 1);
-
-
-        float w00 = (1 - fx) * (1 - fy);
-        float w10 = fx       * (1 - fy);
-        float w01 = (1 - fx) * fy;
-        float w11 = fx       * fy;
-
-        vec3 c = w00 * src[y0 * W + x0]
-            + w10 * src[y0 * W + x1]
-            + w01 * src[y1 * W + x0]
-            + w11 * src[y1 * W + x1];
-        
-        return c;
+        return texture->get_texture(x, y, mip);
     } else {
         return base_color;
     }
