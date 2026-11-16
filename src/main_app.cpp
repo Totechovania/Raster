@@ -17,6 +17,7 @@
 
 #include "vectors.h"
 #include "Renderer.h"
+#include "land.h"
 
 
 static void glfw_error_callback(int error, const char *description)
@@ -174,7 +175,7 @@ int main(int argc, char **argv)
     glfwSetCursorPosCallback(window, cursor_callback);
 
     const float mouse_sensitivity = 0.0025f;
-    const float pitch_limit       = 3.12f / 2;
+    const float pitch_limit = 3.10f / 2;
 
     
 
@@ -206,6 +207,29 @@ int main(int argc, char **argv)
     for (auto model: models) {
         buf_size = std::max(model.mesh.num_vertices, buf_size);
     }
+
+    //terrain
+    PerlinNoise perlin_noise(1234);
+    std::vector<float> heightmap;
+    perlin_noise.fill_perlin(heightmap, 256, 256);
+
+    std::vector<float> heightmap_image;
+    heightmap_image.resize(256 * 256 * 3);
+
+    for (int row = 0; row < 256; row++) {
+            for (int col = 0; col < 256; col++) {
+                int i =  row * 256 + col;
+
+                const float val = 0.5 * heightmap[i] + 0.5;
+
+                heightmap_image[i * 3] = val;
+                heightmap_image[i * 3 + 1] = val;
+                heightmap_image[i * 3 + 2] = val;
+
+            }
+        }
+    save_image_f32_png_rgb(heightmap_image.data(), "peerlin_noize.png", 256, 256, 3, 1.0f);
+    
 
     
     //renderer
@@ -259,6 +283,8 @@ int main(int argc, char **argv)
         HInfo.mouse.dy = 0;
         HInfo.mouse.dx = 0;
 
+        cam.pitch  = std::clamp(cam.pitch, -pitch_limit, pitch_limit);
+        
         f = vec3(cosf(cam.pitch) * cosf(cam.yaw),
             sinf(cam.pitch),
             cosf(cam.pitch) * sinf(cam.yaw));
@@ -267,7 +293,7 @@ int main(int argc, char **argv)
             f.norm();
         }
 
-        cam.pitch  = std::clamp(cam.pitch, -pitch_limit, pitch_limit);
+        
         if (cam.yaw >  3.14f) cam.yaw -= 2 * 3.14f;
         if (cam.yaw < -3.14f) cam.yaw += 2 * 3.14f;
 

@@ -21,6 +21,7 @@ struct Mesh
     
     // При ошибке возвращает пустой меш (num_vertices = num_triangles = 0)
     Mesh(const char *filename);
+    Mesh();
     Mesh &norm();
     Mesh &generate_normals();
 };

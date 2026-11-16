@@ -218,6 +218,13 @@ Mesh::Mesh(const char *filename)
     this->norm();
 }
 
+Mesh::Mesh()
+{
+    num_vertices = 0;
+    num_triangles = 0;
+    has_uv_co = false;
+}
+
 Mesh &Mesh::norm() {
     vec3 max{};
     vec3 min{};

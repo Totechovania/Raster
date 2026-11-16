@@ -1,3 +1,5 @@
+#pragma once
+
 #include "vectors.h"
 #include "mesh_utils.h"
 #include "image_utils.h"

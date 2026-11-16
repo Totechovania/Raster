@@ -220,7 +220,7 @@ inline V floor(const V &b) {
     V res;
 
     for (int i = 0; i < V::dim; i++) {
-        res[i] = std::floorf(b[i]);
+        res[i] = floorf(b[i]);
     }
 
     return res;
@@ -231,7 +231,7 @@ inline V fract(const V &b) {
     V res;
 
     for (int i = 0; i < V::dim; i++) {
-        res[i] = b[i] - std::floorf(b[i]);
+        res[i] = b[i] - floorf(b[i]);
     }
 
     return res;
