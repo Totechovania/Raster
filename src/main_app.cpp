@@ -46,7 +46,7 @@ static void hue_to_rgb(float hue, float rgb[3])
 
 struct {
     //mode swith
-    RENDER_MODE modes[4] = { RENDER_MODE::LAMBERT, RENDER_MODE::DEPTH, RENDER_MODE::NORMALS, RENDER_MODE::MIP_LEVELS_DER,};
+    RENDER_MODE modes[5] = { RENDER_MODE::LAMBERT, RENDER_MODE::DEPTH, RENDER_MODE::NORMALS, RENDER_MODE::MIP_LEVELS_DER, RENDER_MODE::UV};
     int modes_size = sizeof(modes) / sizeof(RENDER_MODE);
     int mode = 0;
 
@@ -156,9 +156,9 @@ int main(int argc, char **argv)
     render_pixels.resize(n_render_pixels * 4);
 
     int int_scale = (int) scale;
-    if ( width == r_width && height == r_height) {
+    if ( fb_width == r_width && fb_height == r_height) {
          resolution_mode = ResolutionMode::NO_SCALE;
-    } else if (width == int_scale * r_width && height == int_scale * r_height) {
+    } else if (fb_width == int_scale * r_width && fb_height == int_scale * r_height) {
         resolution_mode = ResolutionMode::INT_SCALE;
     } else {
         resolution_mode = ResolutionMode::DIM_SCALE;
@@ -209,41 +209,26 @@ int main(int argc, char **argv)
     }
 
     //terrain
-    PerlinNoise perlin_noise(1234);
-    std::vector<float> heightmap;
-    perlin_noise.fill_perlin(heightmap, 256, 256);
+    Texture terrain_hor = Texture("resources/textures/Grass_09-256x256.png", 256, 256, true);
+    Texture terrain_vert = Texture("resources/textures/Grass_11-256x256.png", 256, 256, true);
+    Terrain terrain = Terrain(50, 11, &terrain_hor, &terrain_vert);
 
-    std::vector<float> heightmap_image;
-    heightmap_image.resize(256 * 256 * 3);
 
-    for (int row = 0; row < 256; row++) {
-            for (int col = 0; col < 256; col++) {
-                int i =  row * 256 + col;
-
-                const float val = 0.5 * heightmap[i] + 0.5;
-
-                heightmap_image[i * 3] = val;
-                heightmap_image[i * 3 + 1] = val;
-                heightmap_image[i * 3 + 2] = val;
-
-            }
-        }
-    save_image_f32_png_rgb(heightmap_image.data(), "peerlin_noize.png", 256, 256, 3, 1.0f);
-    
-
-    
     //renderer
-    Texture sky_bk = Texture("resources/textures/skybox/hills_bk.png", 512, 512, true, 1.0f);
-    Texture sky_dn = Texture("resources/textures/skybox/hills_dn.png", 512, 512, true, 1.0f);
-    Texture sky_ft = Texture("resources/textures/skybox/hills_ft.png", 512, 512, true, 1.0f);
-    Texture sky_lf = Texture("resources/textures/skybox/hills_lf.png", 512, 512, true, 1.0f);
-    Texture sky_rt = Texture("resources/textures/skybox/hills_rt.png", 512, 512, true, 1.0f);
-    Texture sky_up = Texture("resources/textures/skybox/hills_up.png", 512, 512, true, 1.0f);
+    Texture sky_bk = Texture("resources/textures/skybox/hills_bk.png", 512, 512, false, 1.0f);
+    Texture sky_dn = Texture("resources/textures/skybox/hills_dn.png", 512, 512, false, 1.0f);
+    Texture sky_ft = Texture("resources/textures/skybox/hills_ft.png", 512, 512, false, 1.0f);
+    Texture sky_lf = Texture("resources/textures/skybox/hills_lf.png", 512, 512, false, 1.0f);
+    Texture sky_rt = Texture("resources/textures/skybox/hills_rt.png", 512, 512, false, 1.0f);
+    Texture sky_up = Texture("resources/textures/skybox/hills_up.png", 512, 512, false, 1.0f);
 
     Skybox skybox(&sky_bk, &sky_dn, &sky_ft, &sky_lf, &sky_rt, &sky_up);
 
+    
+
     Renderer renderer = Renderer(render_pixels, r_width, r_height, buf_size, &skybox);
     renderer.PSI.light_direction = vec3(0, 1, 1).norm();
+    renderer.PSI.terrain = &terrain;
     
     Camera &cam = renderer.cam;
     float cam_speed = 1;
@@ -272,6 +257,9 @@ int main(int argc, char **argv)
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) move = move - f;
         if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) move = move - r;
         if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) move = move + r;
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) move = move + cam.up;
+        if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) move = move - cam.up;
+
 
         if (move.len() > 1e-6f) {
             move = move.norm() * cam_speed * dt;
@@ -310,6 +298,7 @@ int main(int argc, char **argv)
 
         //upscaling
         if (resolution_mode == ResolutionMode::NO_SCALE) {
+            
             glDrawPixels(fb_width, fb_height, GL_RGBA, GL_UNSIGNED_BYTE, render_pixels.data());
 
         } else if (resolution_mode == ResolutionMode::INT_SCALE) {
@@ -348,6 +337,7 @@ int main(int argc, char **argv)
 
             glDrawPixels(fb_width, fb_height, GL_RGBA, GL_UNSIGNED_BYTE, window_pixels.data());
         }
+        
         
         glfwSwapBuffers(window);
         glfwPollEvents();

@@ -70,3 +70,43 @@ void PerlinNoise::fill_perlin(std::vector<float> &vec, int w, int h, int octaves
         }
     }
 }
+
+void Terrain::generate_mesh(int size, float scale) {
+    mesh.verts.resize(size * size);
+    mesh.num_vertices  = size * size;
+    mesh.num_triangles = (size - 1) * (size - 1) * 2;
+
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            float y = scale * (((2.0f *  i) / (size - 1)) - 1);
+            float x = scale * (((2.0f *  j) / (size - 1)) - 1);
+            mesh.verts[i * size + j] = vec3(x, 0, y);
+        }
+    }
+    
+
+    
+    mesh.indices.resize((size - 1) * (size - 1) * 3 * 2);
+
+    for (int i = 0; i < size - 1; i++) {
+        for (int j = 0; j < size - 1; j++) {
+
+            int ind = i * (size - 1) + j;
+            int v1 = i * size + j;
+            int v2 = v1 + 1;
+            int v3 = v1 + size;
+            int v4 = v2 + size;
+
+            mesh.indices[6 * ind] = v1;
+            mesh.indices[6 * ind + 1] = v4;
+            mesh.indices[6 * ind + 2] = v2;
+            
+            mesh.indices[6 * ind + 3] = v1;
+            mesh.indices[6 * ind + 4] = v3;
+            mesh.indices[6 * ind + 5] = v4;
+        }
+    }
+
+
+
+}

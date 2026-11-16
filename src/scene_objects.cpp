@@ -61,7 +61,16 @@ Texture::Texture(const char *filename, int w_v, int h_v, bool mipmaping, float g
             std::copy_n(reinterpret_cast<const vec3*>(texture_img.data()), w*h, textures[0].data());
 
             if (mipmaping) this->generate_mips();
-            else max_mip = 0;
+            else {
+                max_mip = 0;
+                mip_widths.clear();
+                mip_heights.clear();
+
+                mip_widths.push_back(w);
+                mip_heights.push_back(h);
+
+            
+            };
         
         } else {
             this->w = 0;

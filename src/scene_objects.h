@@ -7,6 +7,13 @@
 #include <algorithm>
 #include <cstring>
 
+struct Vertex {
+    vec3 co;
+    float w;
+    float iw;
+    vec3 n;
+    vec2 ts;
+};
 
 struct Camera {
     vec3 eye;

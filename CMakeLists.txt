@@ -17,7 +17,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         add_link_options()
     endif()
 elseif(CMAKE_BUILD_TYPE STREQUAL "Profile")
-    add_compile_options(-Wall -Wno-unused-function -O3 -march=native -pg -flto -ffast-math)
+    add_compile_options(-Wall -Wno-unused-function -O3 -march=native -pg -flto -ffast-math )
     add_link_options(-pg -flto=auto)
 else()
     if(MSVC)
@@ -37,6 +37,7 @@ add_library(raster_utils STATIC
     src/vectors.cpp
     src/scene_objects.cpp
     src/Renderer.cpp
+    src/land.cpp
 )
 target_include_directories(raster_utils PUBLIC src ${CMAKE_CURRENT_SOURCE_DIR})
 if(NOT MSVC)

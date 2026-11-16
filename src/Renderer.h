@@ -4,14 +4,9 @@
 #include <math.h>
 #include <math.h>
 #include <algorithm>
+#include "land.h"
 
-struct Vertex {
-    vec3 co;
-    float w;
-    float iw;
-    vec3 n;
-    vec2 ts;
-};
+
 
 enum class RENDER_MODE{
     RGB_TRINAGLE,
@@ -36,6 +31,11 @@ struct PixelShaderInfo{
     //lambert
     vec3 light_direction;
     Model *model;
+
+    //terrain
+    Terrain *terrain;
+    bool terrain_mode;
+    vec3 priv_snap;
     
 
     PixelShaderInfo() {
@@ -46,6 +46,10 @@ struct PixelShaderInfo{
         //lambert
         light_direction = vec3(0, 1, 1).norm();
         model = NULL;
+
+        terrain = nullptr;
+        terrain_mode = false;
+        priv_snap = vec3();
     };
 
     //depth filrter
@@ -69,8 +73,7 @@ struct PixelShaderInfo{
 
     }
 
-    //test
-    bool flag = true;
+   
 };
 
 struct Renderer{
@@ -98,7 +101,7 @@ struct Renderer{
 
     Camera cam;
 
-    
+    Matrix4 VP;
 
     Renderer(std::vector<uint8_t> &pixels, int &fb_width, int &fb_height, int vert_buf_size, Skybox* skybox=nullptr);
 
@@ -106,6 +109,11 @@ struct Renderer{
 
     void render_scene(std::vector<Model> &models, RENDER_MODE mode = RENDER_MODE::WHITE);
 
+    void render_skybox();
+
+    void process_terrain();
+
+    void render_triangle(Vertex *c, RENDER_MODE mode);
 
     float mip_from_depth(float d, int max_mip) const;
 

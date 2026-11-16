@@ -40,7 +40,6 @@ bilinear_inter(const uint8_t* src, int w, int h, float x, float y, uint8_t *res)
 
 
 
-
 vec3 cross(const vec3 & a, const vec3 &b) {
     return vec3(a.y * b.z - a.z * b.y, - a.x * b.z + a.z * b.x, a.x * b.y - a.y * b.x);
 }
