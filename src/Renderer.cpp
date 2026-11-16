@@ -146,6 +146,9 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
         const float inv_h = 2.0f / fb_height;
 
 
+        uint32_t* p32 = reinterpret_cast<uint32_t*>(pixels.data());
+
+
         for (int row = 0; row < fb_height; row++) {
             float ny = ((row + 0.5f) * inv_h - 1.0f) * inv_Py;
             vec3 u_ny =  u * ny;
@@ -203,9 +206,10 @@ void Renderer::render_scene(std::vector<Model> &models, RENDER_MODE mode) {
 
                 vec3 color = src->get_texture(u, v, 0); 
 
-                pixels[4 * i + 0] = color[0] * 255;
-                pixels[4 * i + 1] = color[1] * 255;
-                pixels[4 * i + 2] = color[2] * 255;
+                p32[i] = 0xFF000000u
+                   | (uint32_t((uint8_t)(color.z * 255.0f + 0.5f)) << 16)
+                   | (uint32_t((uint8_t)(color.y * 255.0f + 0.5f)) <<  8)
+                   |  uint32_t((uint8_t)(color.x * 255.0f + 0.5f));
             }
         }   
     }

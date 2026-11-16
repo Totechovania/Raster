@@ -193,11 +193,45 @@ inline V operator-(const V &a, const V &b) {
 };
 
 template< VectorLike V> 
+inline V operator-(const V &a, float b) {
+    V res;
+
+    for (int i = 0; i < V::dim; i++) {
+        res[i] = a[i] - b;
+    }
+
+    return res;
+};
+
+
+template< VectorLike V> 
 inline V operator-(const V &b) {
     V res;
 
     for (int i = 0; i < V::dim; i++) {
         res[i] = -b[i];
+    }
+
+    return res;
+};
+
+template< VectorLike V> 
+inline V floor(const V &b) {
+    V res;
+
+    for (int i = 0; i < V::dim; i++) {
+        res[i] = std::floorf(b[i]);
+    }
+
+    return res;
+};
+
+template< VectorLike V> 
+inline V fract(const V &b) {
+    V res;
+
+    for (int i = 0; i < V::dim; i++) {
+        res[i] = b[i] - std::floorf(b[i]);
     }
 
     return res;
@@ -226,6 +260,18 @@ inline V operator*(const V &a, float b){
 
     for (int i = 0; i < V::dim; i++) {
         res[i] = a[i] * b;
+    }
+
+    return res;
+};
+
+template< VectorLike V> 
+inline V operator*(const V &a, const V &b){
+    V res;
+
+
+    for (int i = 0; i < V::dim; i++) {
+        res[i] = a[i] * b[i];
     }
 
     return res;
