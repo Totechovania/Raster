@@ -45,7 +45,51 @@ struct Texture {
     Texture(const char *filename, int w_v, int h_v, bool mipmaping=true, float gamma=2.2);
 
     void generate_mips();
-    vec3 get_texture(float x, float y, int mip);
+
+    [[gnu::always_inline]] 
+    inline vec3 get_texture(float x, float y, int mip)
+    {
+        if (mip < 0) mip = 0;
+        if (mip > max_mip) mip = max_mip; 
+
+        
+        const std::vector<vec3> &src = textures[mip];
+        int W = mip_widths[mip];
+        int H = mip_heights[mip];
+
+
+        if (W == 0 || H ==0) return vec3();
+
+        x -= std::floor(x);
+        y -= std::floor(y);
+
+        x = x * W - 0.5f;
+        y = y * H - 0.5f;
+
+        int x0 = (int)std::floor(x);
+        int y0 = (int)std::floor(y);
+        float fx = x - x0;
+        float fy = y - y0;
+
+        int x1 = x0 + 1, y1 = y0 + 1;
+        x0 = std::clamp(x0, 0, W - 1); 
+        x1 = std::clamp(x1, 0, W - 1);
+        y0 = std::clamp(y0, 0, H - 1); 
+        y1 = std::clamp(y1, 0, H - 1);
+
+
+        float w00 = (1 - fx) * (1 - fy);
+        float w10 = fx       * (1 - fy);
+        float w01 = (1 - fx) * fy;
+        float w11 = fx       * fy;
+
+        vec3 c = w00 * src[y0 * W + x0]
+            + w10 * src[y0 * W + x1]
+            + w01 * src[y1 * W + x0]
+            + w11 * src[y1 * W + x1];
+
+        return c;
+    }
 };
 
 
@@ -77,7 +121,16 @@ struct Model {
         update_M();
     };
 
-    vec3 get_texture(float x, float y, int mip);
+
+    [[gnu::always_inline]] 
+    inline vec3 get_texture(float x, float y, int mip)
+    {
+        if ((texture != nullptr) && texture->w > 0 && texture->h > 0) {
+            return texture->get_texture(x, y, mip);
+        } else {
+            return base_color;
+        }
+    }
 
     Matrix4 update_M();
 

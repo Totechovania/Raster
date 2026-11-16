@@ -3,39 +3,56 @@ Flat profile:
 Each sample counts as 0.01 seconds.
   %   cumulative   self              self     total           
  time   seconds   seconds    calls  ms/call  ms/call  name    
- 96.82    222.27   222.27                             main
-  2.63    228.31     6.04 562737907     0.00     0.00  Vertex* std::__uninitialized_default_n_1<false>::__uninit_default_n<Vertex*, unsigned long>(Vertex*, unsigned long)
-  0.22    228.81     0.50                             _init
-  0.19    229.25     0.44   449529     0.00     0.00  parseLine(Command*, char const*, unsigned long, int)
-  0.06    229.39     0.14       36     3.89    20.28  Mesh::Mesh(char const*)
-  0.03    229.45     0.06   810781     0.00     0.00  std::vector<float, std::allocator<float> >::resize(unsigned long)
-  0.03    229.51     0.06   437846     0.00     0.00  parseRawTriple(char const**)
-  0.01    229.54     0.03        8     3.75     3.75  std::vector<vec3, std::allocator<vec3> >::resize(unsigned long)
-  0.00    229.55     0.01    30362     0.00     0.00  operator*(Matrix4 const&, Matrix4 const&)
-  0.00    229.56     0.01    10130     0.00     0.00  Matrix4::Matrix4(Matrix3)
-  0.00    229.57     0.01        4     2.50     2.50  stbi__process_marker(stbi__jpeg*, int)
-  0.00    229.57     0.00    63209     0.00     0.00  stbi__grow_buffer_unsafe(stbi__jpeg*)
-  0.00    229.57     0.00    35457     0.00     0.00  operator*(Matrix3 const&, Matrix3 const&)
-  0.00    229.57     0.00    28800     0.00     0.00  stbi__jpeg_decode_block_prog_dc(stbi__jpeg*, short*, stbi__huffman*, int)
-  0.00    229.57     0.00    14400     0.00     0.00  stbi__idct_simd(unsigned char*, int, short*) [clone .lto_priv.0]
-  0.00    229.57     0.00     5065     0.00     0.00  void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&)
-  0.00    229.57     0.00     1440     0.00     0.00  resample_row_1(unsigned char*, unsigned char*, unsigned char*, int, int) [clone .lto_priv.0]
-  0.00    229.57     0.00     1052     0.00     0.00  std::vector<vec2, std::allocator<vec2> >::resize(unsigned long)
-  0.00    229.57     0.00      480     0.00     0.00  stbi__YCbCr_to_RGB_simd(unsigned char*, unsigned char const*, unsigned char const*, unsigned char const*, int, int) [clone .lto_priv.0]
-  0.00    229.57     0.00       54     0.00     0.00  std::vector<Model, std::allocator<Model> >::push_back(Model const&)
-  0.00    229.57     0.00       22     0.00     0.00  stbi__resample_row_generic(unsigned char*, unsigned char*, unsigned char*, int, int) [clone .lto_priv.0]
-  0.00    229.57     0.00       21     0.00     0.00  length_until_newline(char const*, unsigned long)
-  0.00    229.57     0.00       14     0.00     0.00  std::vector<float, std::allocator<float> >::~vector() [clone .lto_priv.0]
-  0.00    229.57     0.00       13     0.00     0.00  my_strndup(char const*, unsigned long)
-  0.00    229.57     0.00       10     0.00     0.00  stbi__build_huffman(stbi__huffman*, int*)
-  0.00    229.57     0.00        7     0.00     0.00  Model::Model(Model const&)
-  0.00    229.57     0.00        6     0.00     0.00  vec_base<vec3, 3>::norm()
-  0.00    229.57     0.00        3     0.00     0.00  stbi__stdio_skip(void*, int) [clone .lto_priv.0]
-  0.00    229.57     0.00        2     0.00     0.00  stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0]
-  0.00    229.57     0.00        2     0.00     0.00  Mesh::~Mesh()
-  0.00    229.57     0.00        2     0.00     0.00  Camera::update_V()
-  0.00    229.57     0.00        1     0.00     0.00  Renderer::~Renderer()
-  0.00    229.57     0.00        1     0.00     0.00  std::vector<Model, std::allocator<Model> >::~vector()
+ 98.24     17.31    17.31                             main
+  1.19     17.52     0.21   449559     0.00     0.00  parseLine(Command*, char const*, unsigned long, int)
+  0.17     17.55     0.03       15     2.00     2.00  std::vector<vec3, std::allocator<vec3> >::resize(unsigned long)
+  0.17     17.58     0.03       10     3.00     5.40  load_image_f32_rgb(char const*, int*, int*, float)
+  0.11     17.60     0.02        2    10.00   136.09  Mesh::Mesh(char const*)
+  0.06     17.61     0.01   810786     0.00     0.00  Texture::~Texture()
+  0.06     17.62     0.01        5     2.00     2.00  stbi__create_png_image_raw(stbi__png*, unsigned char*, unsigned int, int, unsigned int, unsigned int, int, int)
+  0.00     17.62     0.00   437854     0.00     0.00  parseRawTriple(char const**)
+  0.00     17.62     0.00    78335     0.00     0.00  stbi__grow_buffer_unsafe(stbi__jpeg*)
+  0.00     17.62     0.00    53376     0.00     0.00  stbi__jpeg_decode_block_prog_dc(stbi__jpeg*, short*, stbi__huffman*, int)
+  0.00     17.62     0.00    26688     0.00     0.00  stbi__idct_simd(unsigned char*, int, short*)
+  0.00     17.62     0.00    10252     0.00     0.00  std::vector<std::vector<vec3, std::allocator<vec3> >, std::allocator<std::vector<vec3, std::allocator<vec3> > > >::resize(unsigned long) [clone .constprop.0]
+  0.00     17.62     0.00    10210     0.00     0.00  operator*(Matrix4 const&, Matrix4 const&)
+  0.00     17.62     0.00     3414     0.00     0.00  Matrix4::Matrix4(Matrix3)
+  0.00     17.62     0.00     3414     0.00     0.00  operator*(Matrix3 const&, Matrix3 const&)
+  0.00     17.62     0.00     2976     0.00     0.00  resample_row_1(unsigned char*, unsigned char*, unsigned char*, int, int)
+  0.00     17.62     0.00     1707     0.00     0.00  Model::update_M()
+  0.00     17.62     0.00     1702     0.00     0.00  vec_base<vec3, 3>::norm()
+  0.00     17.62     0.00     1701     0.00     0.00  Camera::update_V()
+  0.00     17.62     0.00     1539     0.00     0.00  stbi__stdio_read(void*, char*, int)
+  0.00     17.62     0.00      992     0.00     0.00  stbi__YCbCr_to_RGB_simd(unsigned char*, unsigned char const*, unsigned char const*, unsigned char const*, int, int)
+  0.00     17.62     0.00      618     0.00     0.00  stbi__get16be(stbi__context*)
+  0.00     17.62     0.00      152     0.00     0.00  stbi__get32be(stbi__context*)
+  0.00     17.62     0.00      115     0.00     0.00  stbi__getn(stbi__context*, unsigned char*, int)
+  0.00     17.62     0.00      106     0.00     0.00  stbi__zbuild_huffman(stbi__zhuffman*, unsigned char const*, int)
+  0.00     17.62     0.00       70     0.00     0.00  void std::vector<int, std::allocator<int> >::_M_realloc_insert<int const&>(__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >, int const&)
+  0.00     17.62     0.00       63     0.00     0.00  stbi__hdr_convert(float*, unsigned char*, int)
+  0.00     17.62     0.00       40     0.00     0.00  stbi__get_marker(stbi__jpeg*)
+  0.00     17.62     0.00       40     0.00     0.00  stbi__pnm_getinteger(stbi__context*, char*)
+  0.00     17.62     0.00       32     0.00     0.00  stbi__process_marker(stbi__jpeg*, int)
+  0.00     17.62     0.00       21     0.00     0.00  length_until_newline(char const*, unsigned long)
+  0.00     17.62     0.00       20     0.00     0.00  stbi__build_huffman(stbi__huffman*, int*)
+  0.00     17.62     0.00       15     0.00     0.00  stbi__hdr_load(stbi__context*, int*, int*, int*, int, stbi__result_info*) [clone .constprop.0]
+  0.00     17.62     0.00       13     0.00     0.00  my_strndup(char const*, unsigned long)
+  0.00     17.62     0.00       12     0.00     0.00  stbi__check_png_header(stbi__context*)
+  0.00     17.62     0.00       11     0.00     0.00  stbi__stdio_skip(void*, int)
+  0.00     17.62     0.00        8     0.00     0.00  std::vector<float, std::allocator<float> >::resize(unsigned long)
+  0.00     17.62     0.00        7     0.00     0.00  void std::_Destroy_aux<false>::__destroy<std::vector<vec3, std::allocator<vec3> >*>(std::vector<vec3, std::allocator<vec3> >*, std::vector<vec3, std::allocator<vec3> >*)
+  0.00     17.62     0.00        7     0.00     0.00  std::vector<std::vector<vec3, std::allocator<vec3> >, std::allocator<std::vector<vec3, std::allocator<vec3> > > >::~vector() [clone .lto_priv.0]
+  0.00     17.62     0.00        6     0.00     0.00  stbi__malloc_mad2(int, int, int)
+  0.00     17.62     0.00        5     0.00     2.00  stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0]
+  0.00     17.62     0.00        4     0.00     0.00  std::vector<vec2, std::allocator<vec2> >::resize(unsigned long)
+  0.00     17.62     0.00        3     0.00     0.00  Model::scale(vec3)
+  0.00     17.62     0.00        3     0.00     0.00  std::vector<Model, std::allocator<Model> >::push_back(Model const&)
+  0.00     17.62     0.00        2     0.00     0.00  cursor_callback(GLFWwindow*, double, double)
+  0.00     17.62     0.00        2     0.00     0.00  stbi__mad4sizes_valid(int, int, int, int, int) [clone .constprop.0]
+  0.00     17.62     0.00        2     0.00     0.00  stbi__decode_jpeg_image(stbi__jpeg*)
+  0.00     17.62     0.00        2     0.00     0.00  Mesh::~Mesh()
+  0.00     17.62     0.00        1     0.00     0.00  Renderer::Renderer(std::vector<unsigned char, std::allocator<unsigned char> >&, int&, int&, int, Skybox*)
+  0.00     17.62     0.00        1     0.00     0.00  Renderer::~Renderer()
 
  %         the percentage of the total running time of the
 time       program used by this function.
@@ -73,194 +90,271 @@ notice and this notice are preserved.
 		     Call graph (explanation follows)
 
 
-granularity: each sample hit covers 4 byte(s) for 0.00% of 229.57 seconds
+granularity: each sample hit covers 4 byte(s) for 0.06% of 17.62 seconds
 
 index % time    self  children    called     name
                                                  <spontaneous>
-[1]     99.8  222.27    6.80                 main [1]
-                6.18    0.59 562737904/562737910     Vertex* std::__uninitialized_default_n_1<false>::__uninit_default_n<Vertex*, unsigned long>(Vertex*, unsigned long) <cycle 1> [3]
-                0.00    0.02    5065/5065        void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
-                0.01    0.00   20230/30362       operator*(Matrix4 const&, Matrix4 const&) [11]
-                0.00    0.00       2/2           Camera::update_V() [14]
-                0.00    0.00       1/810781      std::vector<float, std::allocator<float> >::resize(unsigned long) [7]
-                0.00    0.00       2/562737910     Mesh::Mesh(char const*) <cycle 1> [4]
-                0.00    0.00       8/14          std::vector<float, std::allocator<float> >::~vector() [clone .lto_priv.0] [31]
-                0.00    0.00       4/7           Model::Model(Model const&) [34]
-                0.00    0.00       3/54          std::vector<Model, std::allocator<Model> >::push_back(Model const&) [28]
-                0.00    0.00       2/6           vec_base<vec3, 3>::norm() [35]
-                0.00    0.00       2/2           Mesh::~Mesh() [38]
-                0.00    0.00       1/1           Renderer::~Renderer() [39]
-                0.00    0.00       1/1           std::vector<Model, std::allocator<Model> >::~vector() [40]
+[1]    100.0   17.31    0.31                 main [1]
+                0.02    0.25       2/2           Mesh::Mesh(char const*) [2]
+                0.02    0.02       7/10          load_image_f32_rgb(char const*, int*, int*, float) [4]
+                0.00    0.00       7/810786      Texture::~Texture() [6]
+                0.00    0.00    6796/10210       operator*(Matrix4 const&, Matrix4 const&) [20]
+                0.00    0.00    1704/1707        Model::update_M() [24]
+                0.00    0.00    1700/1702        vec_base<vec3, 3>::norm() [25]
+                0.00    0.00    1699/1701        Camera::update_V() [26]
+                0.00    0.00       3/3           Model::scale(vec3) [49]
+                0.00    0.00       3/3           std::vector<Model, std::allocator<Model> >::push_back(Model const&) [50]
+                0.00    0.00       2/10252       std::vector<std::vector<vec3, std::allocator<vec3> >, std::allocator<std::vector<vec3, std::allocator<vec3> > > >::resize(unsigned long) [clone .constprop.0] [19]
+                0.00    0.00       2/2           Mesh::~Mesh() [54]
+                0.00    0.00       1/1           Renderer::Renderer(std::vector<unsigned char, std::allocator<unsigned char> >&, int&, int&, int, Skybox*) [55]
+                0.00    0.00       1/1           Renderer::~Renderer() [56]
 -----------------------------------------------
-[2]      2.9    6.18    0.59 562737910+33      <cycle 1 as a whole> [2]
-                6.04    0.00 562737907+1           Vertex* std::__uninitialized_default_n_1<false>::__uninit_default_n<Vertex*, unsigned long>(Vertex*, unsigned long) <cycle 1> [3]
-                0.14    0.59      36             Mesh::Mesh(char const*) <cycle 1> [4]
+                0.02    0.25       2/2           main [1]
+[2]      1.5    0.02    0.25       2         Mesh::Mesh(char const*) [2]
+                0.21    0.01  449529/449559      parseLine(Command*, char const*, unsigned long, int) [3]
+                0.01    0.01       3/10          load_image_f32_rgb(char const*, int*, int*, float) [4]
+                0.02    0.00       8/15          std::vector<vec3, std::allocator<vec3> >::resize(unsigned long) [5]
+                0.00    0.00      12/13          my_strndup(char const*, unsigned long) [41]
+                0.00    0.00       4/4           std::vector<vec2, std::allocator<vec2> >::resize(unsigned long) [48]
+                0.00    0.00       2/2           cursor_callback(GLFWwindow*, double, double) [51]
 -----------------------------------------------
-                                   1             Vertex* std::__uninitialized_default_n_1<false>::__uninit_default_n<Vertex*, unsigned long>(Vertex*, unsigned long) <cycle 1> [3]
-                                   3             Mesh::Mesh(char const*) <cycle 1> [4]
-                6.18    0.59 562737904/562737910     main [1]
-[3]      2.6    6.04    0.00 562737907+1       Vertex* std::__uninitialized_default_n_1<false>::__uninit_default_n<Vertex*, unsigned long>(Vertex*, unsigned long) <cycle 1> [3]
-                0.00    0.00      18/810781      std::vector<float, std::allocator<float> >::resize(unsigned long) [7]
-                0.00    0.00       1/13          my_strndup(char const*, unsigned long) [32]
-                                  30             Mesh::Mesh(char const*) <cycle 1> [4]
-                                   1             Vertex* std::__uninitialized_default_n_1<false>::__uninit_default_n<Vertex*, unsigned long>(Vertex*, unsigned long) <cycle 1> [3]
+                0.00    0.00      30/449559      load_image_f32_rgb(char const*, int*, int*, float) [4]
+                0.21    0.01  449529/449559      Mesh::Mesh(char const*) [2]
+[3]      1.2    0.21    0.01  449559         parseLine(Command*, char const*, unsigned long, int) [3]
+                0.01    0.00  810761/810786      Texture::~Texture() [6]
+                0.00    0.00  437846/437854      parseRawTriple(char const**) [15]
+                0.00    0.00      21/21          length_until_newline(char const*, unsigned long) [38]
 -----------------------------------------------
-                                  30             Vertex* std::__uninitialized_default_n_1<false>::__uninit_default_n<Vertex*, unsigned long>(Vertex*, unsigned long) <cycle 1> [3]
-                0.00    0.00       2/562737910     main [1]
-                0.00    0.00       4/562737910     Camera::update_V() [14]
-[4]      0.3    0.14    0.59      36         Mesh::Mesh(char const*) <cycle 1> [4]
-                0.44    0.12  449529/449529      parseLine(Command*, char const*, unsigned long, int) [5]
-                0.03    0.00       8/8           std::vector<vec3, std::allocator<vec3> >::resize(unsigned long) [9]
-                0.00    0.00      72/810781      std::vector<float, std::allocator<float> >::resize(unsigned long) [7]
-                0.00    0.00      12/13          my_strndup(char const*, unsigned long) [32]
-                0.00    0.00       4/1052        std::vector<vec2, std::allocator<vec2> >::resize(unsigned long) [26]
-                0.00    0.00       2/2           stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [37]
-                                   3             Vertex* std::__uninitialized_default_n_1<false>::__uninit_default_n<Vertex*, unsigned long>(Vertex*, unsigned long) <cycle 1> [3]
+                                   8             load_image_f32_rgb(char const*, int*, int*, float) [4]
+                0.01    0.01       3/10          Mesh::Mesh(char const*) [2]
+                0.02    0.02       7/10          main [1]
+[4]      0.3    0.03    0.02      10+8       load_image_f32_rgb(char const*, int*, int*, float) [4]
+                0.01    0.00       7/15          std::vector<vec3, std::allocator<vec3> >::resize(unsigned long) [5]
+                0.00    0.01       5/5           stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [7]
+                0.00    0.00      30/449559      parseLine(Command*, char const*, unsigned long, int) [3]
+                0.00    0.00      18/810786      Texture::~Texture() [6]
+                0.00    0.00    2976/2976        resample_row_1(unsigned char*, unsigned char*, unsigned char*, int, int) [23]
+                0.00    0.00     992/992         stbi__YCbCr_to_RGB_simd(unsigned char*, unsigned char const*, unsigned char const*, unsigned char const*, int, int) [28]
+                0.00    0.00      70/70          void std::vector<int, std::allocator<int> >::_M_realloc_insert<int const&>(__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >, int const&) [33]
+                0.00    0.00      14/10252       std::vector<std::vector<vec3, std::allocator<vec3> >, std::allocator<std::vector<vec3, std::allocator<vec3> > > >::resize(unsigned long) [clone .constprop.0] [19]
+                0.00    0.00       8/63          stbi__hdr_convert(float*, unsigned char*, int) [34]
+                0.00    0.00       7/1539        stbi__stdio_read(void*, char*, int) [27]
+                0.00    0.00       7/12          stbi__check_png_header(stbi__context*) [42]
+                0.00    0.00       7/8           std::vector<float, std::allocator<float> >::resize(unsigned long) [44]
+                0.00    0.00       2/152         stbi__get32be(stbi__context*) [30]
+                0.00    0.00       2/40          stbi__pnm_getinteger(stbi__context*, char*) [36]
+                0.00    0.00       2/40          stbi__get_marker(stbi__jpeg*) [35]
+                0.00    0.00       2/2           stbi__decode_jpeg_image(stbi__jpeg*) [53]
+                0.00    0.00       2/2           stbi__mad4sizes_valid(int, int, int, int, int) [clone .constprop.0] [52]
+                0.00    0.00       1/13          my_strndup(char const*, unsigned long) [41]
+                                   8             load_image_f32_rgb(char const*, int*, int*, float) [4]
 -----------------------------------------------
-                0.44    0.12  449529/449529      Mesh::Mesh(char const*) <cycle 1> [4]
-[5]      0.2    0.44    0.12  449529         parseLine(Command*, char const*, unsigned long, int) [5]
-                0.06    0.00  437846/437846      parseRawTriple(char const**) [8]
-                0.06    0.00  810689/810781      std::vector<float, std::allocator<float> >::resize(unsigned long) [7]
-                0.00    0.00      21/21          length_until_newline(char const*, unsigned long) [30]
+                0.01    0.00       7/15          load_image_f32_rgb(char const*, int*, int*, float) [4]
+                0.02    0.00       8/15          Mesh::Mesh(char const*) [2]
+[5]      0.2    0.03    0.00      15         std::vector<vec3, std::allocator<vec3> >::resize(unsigned long) [5]
 -----------------------------------------------
-                                                 <spontaneous>
-[6]      0.2    0.50    0.00                 _init [6]
+                0.00    0.00       7/810786      main [1]
+                0.00    0.00      18/810786      load_image_f32_rgb(char const*, int*, int*, float) [4]
+                0.01    0.00  810761/810786      parseLine(Command*, char const*, unsigned long, int) [3]
+[6]      0.1    0.01    0.00  810786         Texture::~Texture() [6]
+                0.00    0.00       7/7           std::vector<std::vector<vec3, std::allocator<vec3> >, std::allocator<std::vector<vec3, std::allocator<vec3> > > >::~vector() [clone .lto_priv.0] [46]
 -----------------------------------------------
-                0.00    0.00       1/810781      main [1]
-                0.00    0.00       1/810781      void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
-                0.00    0.00      18/810781      Vertex* std::__uninitialized_default_n_1<false>::__uninit_default_n<Vertex*, unsigned long>(Vertex*, unsigned long) <cycle 1> [3]
-                0.00    0.00      72/810781      Mesh::Mesh(char const*) <cycle 1> [4]
-                0.06    0.00  810689/810781      parseLine(Command*, char const*, unsigned long, int) [5]
-[7]      0.0    0.06    0.00  810781         std::vector<float, std::allocator<float> >::resize(unsigned long) [7]
-                0.00    0.00       2/22          stbi__resample_row_generic(unsigned char*, unsigned char*, unsigned char*, int, int) [clone .lto_priv.0] [29]
+                0.00    0.01       5/5           load_image_f32_rgb(char const*, int*, int*, float) [4]
+[7]      0.1    0.00    0.01       5         stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [7]
+                0.01    0.00       5/5           stbi__create_png_image_raw(stbi__png*, unsigned char*, unsigned int, int, unsigned int, unsigned int, int, int) [8]
+                0.00    0.00     560/618         stbi__get16be(stbi__context*) [29]
+                0.00    0.00     150/152         stbi__get32be(stbi__context*) [30]
+                0.00    0.00     115/115         stbi__getn(stbi__context*, unsigned char*, int) [31]
+                0.00    0.00     106/106         stbi__zbuild_huffman(stbi__zhuffman*, unsigned char const*, int) [32]
+                0.00    0.00      25/63          stbi__hdr_convert(float*, unsigned char*, int) [34]
+                0.00    0.00      15/15          stbi__hdr_load(stbi__context*, int*, int*, int*, int, stbi__result_info*) [clone .constprop.0] [40]
+                0.00    0.00       5/12          stbi__check_png_header(stbi__context*) [42]
+                0.00    0.00       5/11          stbi__stdio_skip(void*, int) [43]
 -----------------------------------------------
-                0.06    0.00  437846/437846      parseLine(Command*, char const*, unsigned long, int) [5]
-[8]      0.0    0.06    0.00  437846         parseRawTriple(char const**) [8]
+                0.01    0.00       5/5           stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [7]
+[8]      0.1    0.01    0.00       5         stbi__create_png_image_raw(stbi__png*, unsigned char*, unsigned int, int, unsigned int, unsigned int, int, int) [8]
 -----------------------------------------------
-                0.03    0.00       8/8           Mesh::Mesh(char const*) <cycle 1> [4]
-[9]      0.0    0.03    0.00       8         std::vector<vec3, std::allocator<vec3> >::resize(unsigned long) [9]
+                0.00    0.00       8/437854      std::vector<float, std::allocator<float> >::resize(unsigned long) [44]
+                0.00    0.00  437846/437854      parseLine(Command*, char const*, unsigned long, int) [3]
+[15]     0.0    0.00    0.00  437854         parseRawTriple(char const**) [15]
 -----------------------------------------------
-                                   4             void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
-                0.00    0.02    5065/5065        main [1]
-[10]     0.0    0.00    0.02    5065+4       void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
-                0.01    0.00   10130/10130       Matrix4::Matrix4(Matrix3) [12]
-                0.01    0.00       4/4           stbi__process_marker(stbi__jpeg*, int) [13]
-                0.00    0.00   10130/30362       operator*(Matrix4 const&, Matrix4 const&) [11]
-                0.00    0.00       1/810781      std::vector<float, std::allocator<float> >::resize(unsigned long) [7]
-                0.00    0.00   35455/35457       operator*(Matrix3 const&, Matrix3 const&) [22]
-                0.00    0.00    1440/1440        resample_row_1(unsigned char*, unsigned char*, unsigned char*, int, int) [clone .lto_priv.0] [25]
-                0.00    0.00     480/480         stbi__YCbCr_to_RGB_simd(unsigned char*, unsigned char const*, unsigned char const*, unsigned char const*, int, int) [clone .lto_priv.0] [27]
-                0.00    0.00       6/14          std::vector<float, std::allocator<float> >::~vector() [clone .lto_priv.0] [31]
-                0.00    0.00       4/54          std::vector<Model, std::allocator<Model> >::push_back(Model const&) [28]
-                0.00    0.00       1/1052        std::vector<vec2, std::allocator<vec2> >::resize(unsigned long) [26]
-                0.00    0.00       1/22          stbi__resample_row_generic(unsigned char*, unsigned char*, unsigned char*, int, int) [clone .lto_priv.0] [29]
-                                   4             void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
+                0.00    0.00    8053/78335       stbi__jpeg_decode_block_prog_dc(stbi__jpeg*, short*, stbi__huffman*, int) [17]
+                0.00    0.00   70282/78335       stbi__decode_jpeg_image(stbi__jpeg*) [53]
+[16]     0.0    0.00    0.00   78335         stbi__grow_buffer_unsafe(stbi__jpeg*) [16]
+                0.00    0.00    1285/1539        stbi__stdio_read(void*, char*, int) [27]
 -----------------------------------------------
-                0.00    0.00       2/30362       Camera::update_V() [14]
-                0.00    0.00   10130/30362       void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
-                0.01    0.00   20230/30362       main [1]
-[11]     0.0    0.01    0.00   30362         operator*(Matrix4 const&, Matrix4 const&) [11]
+                0.00    0.00   53376/53376       stbi__decode_jpeg_image(stbi__jpeg*) [53]
+[17]     0.0    0.00    0.00   53376         stbi__jpeg_decode_block_prog_dc(stbi__jpeg*, short*, stbi__huffman*, int) [17]
+                0.00    0.00    8053/78335       stbi__grow_buffer_unsafe(stbi__jpeg*) [16]
 -----------------------------------------------
-                0.01    0.00   10130/10130       void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
-[12]     0.0    0.01    0.00   10130         Matrix4::Matrix4(Matrix3) [12]
+                0.00    0.00   26688/26688       stbi__decode_jpeg_image(stbi__jpeg*) [53]
+[18]     0.0    0.00    0.00   26688         stbi__idct_simd(unsigned char*, int, short*) [18]
 -----------------------------------------------
-                                  35             stbi__process_marker(stbi__jpeg*, int) [13]
-                0.01    0.00       4/4           void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
-[13]     0.0    0.01    0.00       4+35      stbi__process_marker(stbi__jpeg*, int) [13]
-                0.00    0.00   58494/63209       stbi__grow_buffer_unsafe(stbi__jpeg*) [21]
-                0.00    0.00   28800/28800       stbi__jpeg_decode_block_prog_dc(stbi__jpeg*, short*, stbi__huffman*, int) [23]
-                0.00    0.00   14400/14400       stbi__idct_simd(unsigned char*, int, short*) [clone .lto_priv.0] [24]
-                0.00    0.00      47/54          std::vector<Model, std::allocator<Model> >::push_back(Model const&) [28]
-                0.00    0.00      19/22          stbi__resample_row_generic(unsigned char*, unsigned char*, unsigned char*, int, int) [clone .lto_priv.0] [29]
-                0.00    0.00      10/10          stbi__build_huffman(stbi__huffman*, int*) [33]
-                0.00    0.00       4/1052        std::vector<vec2, std::allocator<vec2> >::resize(unsigned long) [26]
-                0.00    0.00       3/3           stbi__stdio_skip(void*, int) [clone .lto_priv.0] [36]
-                                  35             stbi__process_marker(stbi__jpeg*, int) [13]
+                0.00    0.00       2/10252       main [1]
+                0.00    0.00      14/10252       load_image_f32_rgb(char const*, int*, int*, float) [4]
+                0.00    0.00    1701/10252       Camera::update_V() [26]
+                0.00    0.00    8535/10252       Model::update_M() [24]
+[19]     0.0    0.00    0.00   10252         std::vector<std::vector<vec3, std::allocator<vec3> >, std::allocator<std::vector<vec3, std::allocator<vec3> > > >::resize(unsigned long) [clone .constprop.0] [19]
+-----------------------------------------------
+                0.00    0.00    3414/10210       Model::update_M() [24]
+                0.00    0.00    6796/10210       main [1]
+[20]     0.0    0.00    0.00   10210         operator*(Matrix4 const&, Matrix4 const&) [20]
+-----------------------------------------------
+                0.00    0.00    3414/3414        Model::update_M() [24]
+[21]     0.0    0.00    0.00    3414         Matrix4::Matrix4(Matrix3) [21]
+-----------------------------------------------
+                0.00    0.00    3414/3414        Model::update_M() [24]
+[22]     0.0    0.00    0.00    3414         operator*(Matrix3 const&, Matrix3 const&) [22]
+-----------------------------------------------
+                0.00    0.00    2976/2976        load_image_f32_rgb(char const*, int*, int*, float) [4]
+[23]     0.0    0.00    0.00    2976         resample_row_1(unsigned char*, unsigned char*, unsigned char*, int, int) [23]
+-----------------------------------------------
+                0.00    0.00       3/1707        Model::scale(vec3) [49]
+                0.00    0.00    1704/1707        main [1]
+[24]     0.0    0.00    0.00    1707         Model::update_M() [24]
+                0.00    0.00    8535/10252       std::vector<std::vector<vec3, std::allocator<vec3> >, std::allocator<std::vector<vec3, std::allocator<vec3> > > >::resize(unsigned long) [clone .constprop.0] [19]
+                0.00    0.00    3414/3414        Matrix4::Matrix4(Matrix3) [21]
+                0.00    0.00    3414/3414        operator*(Matrix3 const&, Matrix3 const&) [22]
+                0.00    0.00    3414/10210       operator*(Matrix4 const&, Matrix4 const&) [20]
+-----------------------------------------------
+                0.00    0.00       2/1702        Renderer::Renderer(std::vector<unsigned char, std::allocator<unsigned char> >&, int&, int&, int, Skybox*) [55]
+                0.00    0.00    1700/1702        main [1]
+[25]     0.0    0.00    0.00    1702         vec_base<vec3, 3>::norm() [25]
+-----------------------------------------------
+                0.00    0.00       2/1701        Renderer::Renderer(std::vector<unsigned char, std::allocator<unsigned char> >&, int&, int&, int, Skybox*) [55]
+                0.00    0.00    1699/1701        main [1]
+[26]     0.0    0.00    0.00    1701         Camera::update_V() [26]
+                0.00    0.00    1701/10252       std::vector<std::vector<vec3, std::allocator<vec3> >, std::allocator<std::vector<vec3, std::allocator<vec3> > > >::resize(unsigned long) [clone .constprop.0] [19]
+-----------------------------------------------
+                0.00    0.00       1/1539        stbi__get16be(stbi__context*) [29]
+                0.00    0.00       5/1539        stbi__process_marker(stbi__jpeg*, int) [37]
+                0.00    0.00       6/1539        stbi__get_marker(stbi__jpeg*) [35]
+                0.00    0.00       7/1539        load_image_f32_rgb(char const*, int*, int*, float) [4]
+                0.00    0.00     115/1539        stbi__getn(stbi__context*, unsigned char*, int) [31]
+                0.00    0.00     120/1539        stbi__get32be(stbi__context*) [30]
+                0.00    0.00    1285/1539        stbi__grow_buffer_unsafe(stbi__jpeg*) [16]
+[27]     0.0    0.00    0.00    1539         stbi__stdio_read(void*, char*, int) [27]
+-----------------------------------------------
+                0.00    0.00     992/992         load_image_f32_rgb(char const*, int*, int*, float) [4]
+[28]     0.0    0.00    0.00     992         stbi__YCbCr_to_RGB_simd(unsigned char*, unsigned char const*, unsigned char const*, unsigned char const*, int, int) [28]
+-----------------------------------------------
+                0.00    0.00      26/618         stbi__decode_jpeg_image(stbi__jpeg*) [53]
+                0.00    0.00      32/618         stbi__process_marker(stbi__jpeg*, int) [37]
+                0.00    0.00     560/618         stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [7]
+[29]     0.0    0.00    0.00     618         stbi__get16be(stbi__context*) [29]
+                0.00    0.00       1/1539        stbi__stdio_read(void*, char*, int) [27]
+-----------------------------------------------
+                0.00    0.00       2/152         load_image_f32_rgb(char const*, int*, int*, float) [4]
+                0.00    0.00     150/152         stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [7]
+[30]     0.0    0.00    0.00     152         stbi__get32be(stbi__context*) [30]
+                0.00    0.00     120/1539        stbi__stdio_read(void*, char*, int) [27]
+-----------------------------------------------
+                0.00    0.00     115/115         stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [7]
+[31]     0.0    0.00    0.00     115         stbi__getn(stbi__context*, unsigned char*, int) [31]
+                0.00    0.00     115/1539        stbi__stdio_read(void*, char*, int) [27]
+-----------------------------------------------
+                0.00    0.00     106/106         stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [7]
+[32]     0.0    0.00    0.00     106         stbi__zbuild_huffman(stbi__zhuffman*, unsigned char const*, int) [32]
+-----------------------------------------------
+                0.00    0.00      70/70          load_image_f32_rgb(char const*, int*, int*, float) [4]
+[33]     0.0    0.00    0.00      70         void std::vector<int, std::allocator<int> >::_M_realloc_insert<int const&>(__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >, int const&) [33]
+-----------------------------------------------
+                0.00    0.00       8/63          load_image_f32_rgb(char const*, int*, int*, float) [4]
+                0.00    0.00      25/63          stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [7]
+                0.00    0.00      30/63          stbi__decode_jpeg_image(stbi__jpeg*) [53]
+[34]     0.0    0.00    0.00      63         stbi__hdr_convert(float*, unsigned char*, int) [34]
+-----------------------------------------------
+                0.00    0.00       2/40          load_image_f32_rgb(char const*, int*, int*, float) [4]
+                0.00    0.00      38/40          stbi__decode_jpeg_image(stbi__jpeg*) [53]
+[35]     0.0    0.00    0.00      40         stbi__get_marker(stbi__jpeg*) [35]
+                0.00    0.00       6/1539        stbi__stdio_read(void*, char*, int) [27]
+-----------------------------------------------
+                0.00    0.00       2/40          load_image_f32_rgb(char const*, int*, int*, float) [4]
+                0.00    0.00      38/40          stbi__decode_jpeg_image(stbi__jpeg*) [53]
+[36]     0.0    0.00    0.00      40         stbi__pnm_getinteger(stbi__context*, char*) [36]
+-----------------------------------------------
+                0.00    0.00      32/32          stbi__decode_jpeg_image(stbi__jpeg*) [53]
+[37]     0.0    0.00    0.00      32         stbi__process_marker(stbi__jpeg*, int) [37]
+                0.00    0.00      32/618         stbi__get16be(stbi__context*) [29]
+                0.00    0.00      20/20          stbi__build_huffman(stbi__huffman*, int*) [39]
+                0.00    0.00       6/11          stbi__stdio_skip(void*, int) [43]
+                0.00    0.00       5/1539        stbi__stdio_read(void*, char*, int) [27]
+-----------------------------------------------
+                0.00    0.00      21/21          parseLine(Command*, char const*, unsigned long, int) [3]
+[38]     0.0    0.00    0.00      21         length_until_newline(char const*, unsigned long) [38]
+-----------------------------------------------
+                0.00    0.00      20/20          stbi__process_marker(stbi__jpeg*, int) [37]
+[39]     0.0    0.00    0.00      20         stbi__build_huffman(stbi__huffman*, int*) [39]
+-----------------------------------------------
+                0.00    0.00      15/15          stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [7]
+[40]     0.0    0.00    0.00      15         stbi__hdr_load(stbi__context*, int*, int*, int*, int, stbi__result_info*) [clone .constprop.0] [40]
+-----------------------------------------------
+                0.00    0.00       1/13          load_image_f32_rgb(char const*, int*, int*, float) [4]
+                0.00    0.00      12/13          Mesh::Mesh(char const*) [2]
+[41]     0.0    0.00    0.00      13         my_strndup(char const*, unsigned long) [41]
+-----------------------------------------------
+                0.00    0.00       5/12          stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [7]
+                0.00    0.00       7/12          load_image_f32_rgb(char const*, int*, int*, float) [4]
+[42]     0.0    0.00    0.00      12         stbi__check_png_header(stbi__context*) [42]
+-----------------------------------------------
+                0.00    0.00       5/11          stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [7]
+                0.00    0.00       6/11          stbi__process_marker(stbi__jpeg*, int) [37]
+[43]     0.0    0.00    0.00      11         stbi__stdio_skip(void*, int) [43]
+-----------------------------------------------
+                0.00    0.00       1/8           Renderer::Renderer(std::vector<unsigned char, std::allocator<unsigned char> >&, int&, int&, int, Skybox*) [55]
+                0.00    0.00       7/8           load_image_f32_rgb(char const*, int*, int*, float) [4]
+[44]     0.0    0.00    0.00       8         std::vector<float, std::allocator<float> >::resize(unsigned long) [44]
+                0.00    0.00       8/437854      parseRawTriple(char const**) [15]
+-----------------------------------------------
+                0.00    0.00       7/7           std::vector<std::vector<vec3, std::allocator<vec3> >, std::allocator<std::vector<vec3, std::allocator<vec3> > > >::~vector() [clone .lto_priv.0] [46]
+[45]     0.0    0.00    0.00       7         void std::_Destroy_aux<false>::__destroy<std::vector<vec3, std::allocator<vec3> >*>(std::vector<vec3, std::allocator<vec3> >*, std::vector<vec3, std::allocator<vec3> >*) [45]
+-----------------------------------------------
+                0.00    0.00       7/7           Texture::~Texture() [6]
+[46]     0.0    0.00    0.00       7         std::vector<std::vector<vec3, std::allocator<vec3> >, std::allocator<std::vector<vec3, std::allocator<vec3> > > >::~vector() [clone .lto_priv.0] [46]
+                0.00    0.00       7/7           void std::_Destroy_aux<false>::__destroy<std::vector<vec3, std::allocator<vec3> >*>(std::vector<vec3, std::allocator<vec3> >*, std::vector<vec3, std::allocator<vec3> >*) [45]
+-----------------------------------------------
+                0.00    0.00       6/6           stbi__decode_jpeg_image(stbi__jpeg*) [53]
+[47]     0.0    0.00    0.00       6         stbi__malloc_mad2(int, int, int) [47]
+-----------------------------------------------
+                0.00    0.00       4/4           Mesh::Mesh(char const*) [2]
+[48]     0.0    0.00    0.00       4         std::vector<vec2, std::allocator<vec2> >::resize(unsigned long) [48]
+-----------------------------------------------
+                0.00    0.00       3/3           main [1]
+[49]     0.0    0.00    0.00       3         Model::scale(vec3) [49]
+                0.00    0.00       3/1707        Model::update_M() [24]
+-----------------------------------------------
+                0.00    0.00       3/3           main [1]
+[50]     0.0    0.00    0.00       3         std::vector<Model, std::allocator<Model> >::push_back(Model const&) [50]
+-----------------------------------------------
+                0.00    0.00       2/2           Mesh::Mesh(char const*) [2]
+[51]     0.0    0.00    0.00       2         cursor_callback(GLFWwindow*, double, double) [51]
+-----------------------------------------------
+                0.00    0.00       2/2           load_image_f32_rgb(char const*, int*, int*, float) [4]
+[52]     0.0    0.00    0.00       2         stbi__mad4sizes_valid(int, int, int, int, int) [clone .constprop.0] [52]
+-----------------------------------------------
+                0.00    0.00       2/2           load_image_f32_rgb(char const*, int*, int*, float) [4]
+[53]     0.0    0.00    0.00       2         stbi__decode_jpeg_image(stbi__jpeg*) [53]
+                0.00    0.00   70282/78335       stbi__grow_buffer_unsafe(stbi__jpeg*) [16]
+                0.00    0.00   53376/53376       stbi__jpeg_decode_block_prog_dc(stbi__jpeg*, short*, stbi__huffman*, int) [17]
+                0.00    0.00   26688/26688       stbi__idct_simd(unsigned char*, int, short*) [18]
+                0.00    0.00      38/40          stbi__pnm_getinteger(stbi__context*, char*) [36]
+                0.00    0.00      38/40          stbi__get_marker(stbi__jpeg*) [35]
+                0.00    0.00      32/32          stbi__process_marker(stbi__jpeg*, int) [37]
+                0.00    0.00      30/63          stbi__hdr_convert(float*, unsigned char*, int) [34]
+                0.00    0.00      26/618         stbi__get16be(stbi__context*) [29]
+                0.00    0.00       6/6           stbi__malloc_mad2(int, int, int) [47]
 -----------------------------------------------
                 0.00    0.00       2/2           main [1]
-[14]     0.0    0.00    0.00       2         Camera::update_V() [14]
-                0.00    0.00       2/30362       operator*(Matrix4 const&, Matrix4 const&) [11]
-                0.00    0.00       4/562737910     Mesh::Mesh(char const*) <cycle 1> [4]
-                0.00    0.00       4/6           vec_base<vec3, 3>::norm() [35]
-                0.00    0.00       2/35457       operator*(Matrix3 const&, Matrix3 const&) [22]
------------------------------------------------
-                0.00    0.00    4715/63209       stbi__jpeg_decode_block_prog_dc(stbi__jpeg*, short*, stbi__huffman*, int) [23]
-                0.00    0.00   58494/63209       stbi__process_marker(stbi__jpeg*, int) [13]
-[21]     0.0    0.00    0.00   63209         stbi__grow_buffer_unsafe(stbi__jpeg*) [21]
-                0.00    0.00    1042/1052        std::vector<vec2, std::allocator<vec2> >::resize(unsigned long) [26]
------------------------------------------------
-                0.00    0.00       2/35457       Camera::update_V() [14]
-                0.00    0.00   35455/35457       void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
-[22]     0.0    0.00    0.00   35457         operator*(Matrix3 const&, Matrix3 const&) [22]
------------------------------------------------
-                0.00    0.00   28800/28800       stbi__process_marker(stbi__jpeg*, int) [13]
-[23]     0.0    0.00    0.00   28800         stbi__jpeg_decode_block_prog_dc(stbi__jpeg*, short*, stbi__huffman*, int) [23]
-                0.00    0.00    4715/63209       stbi__grow_buffer_unsafe(stbi__jpeg*) [21]
------------------------------------------------
-                0.00    0.00   14400/14400       stbi__process_marker(stbi__jpeg*, int) [13]
-[24]     0.0    0.00    0.00   14400         stbi__idct_simd(unsigned char*, int, short*) [clone .lto_priv.0] [24]
------------------------------------------------
-                0.00    0.00    1440/1440        void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
-[25]     0.0    0.00    0.00    1440         resample_row_1(unsigned char*, unsigned char*, unsigned char*, int, int) [clone .lto_priv.0] [25]
------------------------------------------------
-                0.00    0.00       1/1052        std::vector<Model, std::allocator<Model> >::push_back(Model const&) [28]
-                0.00    0.00       1/1052        void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
-                0.00    0.00       4/1052        stbi__process_marker(stbi__jpeg*, int) [13]
-                0.00    0.00       4/1052        Mesh::Mesh(char const*) <cycle 1> [4]
-                0.00    0.00    1042/1052        stbi__grow_buffer_unsafe(stbi__jpeg*) [21]
-[26]     0.0    0.00    0.00    1052         std::vector<vec2, std::allocator<vec2> >::resize(unsigned long) [26]
------------------------------------------------
-                0.00    0.00     480/480         void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
-[27]     0.0    0.00    0.00     480         stbi__YCbCr_to_RGB_simd(unsigned char*, unsigned char const*, unsigned char const*, unsigned char const*, int, int) [clone .lto_priv.0] [27]
------------------------------------------------
-                0.00    0.00       3/54          main [1]
-                0.00    0.00       4/54          void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
-                0.00    0.00      47/54          stbi__process_marker(stbi__jpeg*, int) [13]
-[28]     0.0    0.00    0.00      54         std::vector<Model, std::allocator<Model> >::push_back(Model const&) [28]
-                0.00    0.00       3/7           Model::Model(Model const&) [34]
-                0.00    0.00       1/1052        std::vector<vec2, std::allocator<vec2> >::resize(unsigned long) [26]
------------------------------------------------
-                0.00    0.00       1/22          void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
-                0.00    0.00       2/22          std::vector<float, std::allocator<float> >::resize(unsigned long) [7]
-                0.00    0.00      19/22          stbi__process_marker(stbi__jpeg*, int) [13]
-[29]     0.0    0.00    0.00      22         stbi__resample_row_generic(unsigned char*, unsigned char*, unsigned char*, int, int) [clone .lto_priv.0] [29]
------------------------------------------------
-                0.00    0.00      21/21          parseLine(Command*, char const*, unsigned long, int) [5]
-[30]     0.0    0.00    0.00      21         length_until_newline(char const*, unsigned long) [30]
------------------------------------------------
-                0.00    0.00       6/14          void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [10]
-                0.00    0.00       8/14          main [1]
-[31]     0.0    0.00    0.00      14         std::vector<float, std::allocator<float> >::~vector() [clone .lto_priv.0] [31]
------------------------------------------------
-                0.00    0.00       1/13          Vertex* std::__uninitialized_default_n_1<false>::__uninit_default_n<Vertex*, unsigned long>(Vertex*, unsigned long) <cycle 1> [3]
-                0.00    0.00      12/13          Mesh::Mesh(char const*) <cycle 1> [4]
-[32]     0.0    0.00    0.00      13         my_strndup(char const*, unsigned long) [32]
------------------------------------------------
-                0.00    0.00      10/10          stbi__process_marker(stbi__jpeg*, int) [13]
-[33]     0.0    0.00    0.00      10         stbi__build_huffman(stbi__huffman*, int*) [33]
------------------------------------------------
-                0.00    0.00       3/7           std::vector<Model, std::allocator<Model> >::push_back(Model const&) [28]
-                0.00    0.00       4/7           main [1]
-[34]     0.0    0.00    0.00       7         Model::Model(Model const&) [34]
------------------------------------------------
-                0.00    0.00       2/6           main [1]
-                0.00    0.00       4/6           Camera::update_V() [14]
-[35]     0.0    0.00    0.00       6         vec_base<vec3, 3>::norm() [35]
------------------------------------------------
-                0.00    0.00       3/3           stbi__process_marker(stbi__jpeg*, int) [13]
-[36]     0.0    0.00    0.00       3         stbi__stdio_skip(void*, int) [clone .lto_priv.0] [36]
------------------------------------------------
-                0.00    0.00       2/2           Mesh::Mesh(char const*) <cycle 1> [4]
-[37]     0.0    0.00    0.00       2         stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [37]
------------------------------------------------
-                0.00    0.00       2/2           main [1]
-[38]     0.0    0.00    0.00       2         Mesh::~Mesh() [38]
+[54]     0.0    0.00    0.00       2         Mesh::~Mesh() [54]
 -----------------------------------------------
                 0.00    0.00       1/1           main [1]
-[39]     0.0    0.00    0.00       1         Renderer::~Renderer() [39]
+[55]     0.0    0.00    0.00       1         Renderer::Renderer(std::vector<unsigned char, std::allocator<unsigned char> >&, int&, int&, int, Skybox*) [55]
+                0.00    0.00       2/1702        vec_base<vec3, 3>::norm() [25]
+                0.00    0.00       2/1701        Camera::update_V() [26]
+                0.00    0.00       1/8           std::vector<float, std::allocator<float> >::resize(unsigned long) [44]
 -----------------------------------------------
                 0.00    0.00       1/1           main [1]
-[40]     0.0    0.00    0.00       1         std::vector<Model, std::allocator<Model> >::~vector() [40]
+[56]     0.0    0.00    0.00       1         Renderer::~Renderer() [56]
 -----------------------------------------------
 
  This table describes the call tree of the program, and was sorted by
@@ -353,15 +447,20 @@ notice and this notice are preserved.
 
 Index by function name
 
-  [32] my_strndup(char const*, unsigned long) [23] stbi__jpeg_decode_block_prog_dc(stbi__jpeg*, short*, stbi__huffman*, int) [9] std::vector<vec3, std::allocator<vec3> >::resize(unsigned long)
-   [8] parseRawTriple(char const**) [5] parseLine(Command*, char const*, unsigned long, int) [28] std::vector<Model, std::allocator<Model> >::push_back(Model const&)
-  [25] resample_row_1(unsigned char*, unsigned char*, unsigned char*, int, int) [clone .lto_priv.0] [4] Mesh::Mesh(char const*) [40] std::vector<Model, std::allocator<Model> >::~vector()
-  [24] stbi__idct_simd(unsigned char*, int, short*) [clone .lto_priv.0] [38] Mesh::~Mesh() [7] std::vector<float, std::allocator<float> >::resize(unsigned long)
-  [36] stbi__stdio_skip(void*, int) [clone .lto_priv.0] [34] Model::Model(Model const&) [31] std::vector<float, std::allocator<float> >::~vector() [clone .lto_priv.0]
-  [33] stbi__build_huffman(stbi__huffman*, int*) [14] Camera::update_V() [22] operator*(Matrix3 const&, Matrix3 const&)
-  [30] length_until_newline(char const*, unsigned long) [12] Matrix4::Matrix4(Matrix3) [11] operator*(Matrix4 const&, Matrix4 const&)
-  [37] stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [10] void Renderer::render_scene_impl<(RENDER_MODE)2>(std::vector<Model, std::allocator<Model> >&) [6] _init
-  [13] stbi__process_marker(stbi__jpeg*, int) [39] Renderer::~Renderer() [1] main
-  [27] stbi__YCbCr_to_RGB_simd(unsigned char*, unsigned char const*, unsigned char const*, unsigned char const*, int, int) [clone .lto_priv.0] [35] vec_base<vec3, 3>::norm() [2] <cycle 1>
-  [21] stbi__grow_buffer_unsafe(stbi__jpeg*) [3] Vertex* std::__uninitialized_default_n_1<false>::__uninit_default_n<Vertex*, unsigned long>(Vertex*, unsigned long)
-  [29] stbi__resample_row_generic(unsigned char*, unsigned char*, unsigned char*, int, int) [clone .lto_priv.0] [26] std::vector<vec2, std::allocator<vec2> >::resize(unsigned long)
+   [4] load_image_f32_rgb(char const*, int*, int*, float) [7] stbi__parse_png_file(stbi__png*, int, int) [clone .constprop.0] [21] Matrix4::Matrix4(Matrix3)
+  [41] my_strndup(char const*, unsigned long) [36] stbi__pnm_getinteger(stbi__context*, char*) [6] Texture::~Texture()
+  [31] stbi__getn(stbi__context*, unsigned char*, int) [37] stbi__process_marker(stbi__jpeg*, int) [55] Renderer::Renderer(std::vector<unsigned char, std::allocator<unsigned char> >&, int&, int&, int, Skybox*)
+  [29] stbi__get16be(stbi__context*) [32] stbi__zbuild_huffman(stbi__zhuffman*, unsigned char const*, int) [56] Renderer::~Renderer()
+  [30] stbi__get32be(stbi__context*) [52] stbi__mad4sizes_valid(int, int, int, int, int) [clone .constprop.0] [25] vec_base<vec3, 3>::norm()
+  [15] parseRawTriple(char const**) [42] stbi__check_png_header(stbi__context*) [45] void std::_Destroy_aux<false>::__destroy<std::vector<vec3, std::allocator<vec3> >*>(std::vector<vec3, std::allocator<vec3> >*, std::vector<vec3, std::allocator<vec3> >*)
+  [23] resample_row_1(unsigned char*, unsigned char*, unsigned char*, int, int) [28] stbi__YCbCr_to_RGB_simd(unsigned char*, unsigned char const*, unsigned char const*, unsigned char const*, int, int) [48] std::vector<vec2, std::allocator<vec2> >::resize(unsigned long)
+  [40] stbi__hdr_load(stbi__context*, int*, int*, int*, int, stbi__result_info*) [clone .constprop.0] [53] stbi__decode_jpeg_image(stbi__jpeg*) [5] std::vector<vec3, std::allocator<vec3> >::resize(unsigned long)
+  [51] cursor_callback(GLFWwindow*, double, double) [16] stbi__grow_buffer_unsafe(stbi__jpeg*) [50] std::vector<Model, std::allocator<Model> >::push_back(Model const&)
+  [18] stbi__idct_simd(unsigned char*, int, short*) [8] stbi__create_png_image_raw(stbi__png*, unsigned char*, unsigned int, int, unsigned int, unsigned int, int, int) [19] std::vector<std::vector<vec3, std::allocator<vec3> >, std::allocator<std::vector<vec3, std::allocator<vec3> > > >::resize(unsigned long) [clone .constprop.0]
+  [35] stbi__get_marker(stbi__jpeg*) [17] stbi__jpeg_decode_block_prog_dc(stbi__jpeg*, short*, stbi__huffman*, int) [46] std::vector<std::vector<vec3, std::allocator<vec3> >, std::allocator<std::vector<vec3, std::allocator<vec3> > > >::~vector() [clone .lto_priv.0]
+  [27] stbi__stdio_read(void*, char*, int) [3] parseLine(Command*, char const*, unsigned long, int) [44] std::vector<float, std::allocator<float> >::resize(unsigned long)
+  [43] stbi__stdio_skip(void*, int) [2] Mesh::Mesh(char const*) [33] void std::vector<int, std::allocator<int> >::_M_realloc_insert<int const&>(__gnu_cxx::__normal_iterator<int*, std::vector<int, std::allocator<int> > >, int const&)
+  [34] stbi__hdr_convert(float*, unsigned char*, int) [54] Mesh::~Mesh() [22] operator*(Matrix3 const&, Matrix3 const&)
+  [47] stbi__malloc_mad2(int, int, int) [49] Model::scale(vec3) [20] operator*(Matrix4 const&, Matrix4 const&)
+  [39] stbi__build_huffman(stbi__huffman*, int*) [24] Model::update_M() [1] main
+  [38] length_until_newline(char const*, unsigned long) [26] Camera::update_V()

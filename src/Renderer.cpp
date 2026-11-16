@@ -247,6 +247,8 @@ static inline vec3 mip_debug_color(int mip, int max_mip) {
     }
 }
 
+
+[[gnu::always_inline]]
 inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, RENDER_MODE mode) {
 
     
