@@ -62,7 +62,7 @@ struct {
     //camera_mod
     float height = 0;
     bool hover_mod = false;
-    bool height_update = false;
+    bool height_updated = false;
     
 
 } HInfo;
@@ -76,6 +76,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
     
+    if (key == GLFW_KEY_H && action == GLFW_PRESS) {
+        HInfo.hover_mod = !HInfo.hover_mod;
+        HInfo.height_updated = false;
+    }
 }
 
 static void cursor_callback(GLFWwindow* w, double x, double y) {
@@ -254,7 +258,13 @@ int main(int argc, char **argv)
 
 
         // camera
-        vec3 f = (cam.target - cam.eye).norm();
+
+        vec3 f = (cam.target - cam.eye);
+        if (HInfo.hover_mod) {
+            f.y = 0;
+        } 
+        f.norm();
+
         vec3 r = cross(f, cam.up).norm();
         vec3 move = vec3(0);
 
@@ -290,7 +300,18 @@ int main(int argc, char **argv)
         if (cam.yaw >  3.14f) cam.yaw -= 2 * 3.14f;
         if (cam.yaw < -3.14f) cam.yaw += 2 * 3.14f;
 
-        cam.look_at(cam.eye + move, cam.eye + f + move, cam.up);
+        cam.eye = cam.eye + move;
+
+        if (HInfo.hover_mod && renderer.PSI.terrain != nullptr) {
+            if (!HInfo.height_updated) {
+                HInfo.height = cam.eye.y - renderer.PSI.terrain->get_height(cam.eye.x, cam.eye.z);
+                HInfo.height_updated = true;
+            }
+
+            cam.eye.y = HInfo.height + renderer.PSI.terrain->get_height(cam.eye.x, cam.eye.z);
+        }
+
+        cam.look_at(cam.eye, cam.eye + f, cam.up);
 
 
         // models
