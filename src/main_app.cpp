@@ -58,6 +58,11 @@ struct {
         float last_y = 0;
         bool first = true;
     } mouse;
+
+    //camera_mod
+    float height = 0;
+    bool hover_mod = false;
+    bool height_update = false;
     
 
 } HInfo;
@@ -193,7 +198,7 @@ int main(int argc, char **argv)
     b1.id = 0;
     models.push_back(b1);
     
-    Model m1 = Model(m, &porcelain_tx).scale(vec3(2, 0.8, 1)).translate(vec3(-1, 1, 0));
+    Model m1 = Model(m).scale(vec3(2, 0.8, 1)).translate(vec3(-1, 1, 0));
     m1.base_color = vec3(1, 1, 1);
     m1.id = 0;
     models.push_back(m1);
@@ -211,7 +216,7 @@ int main(int argc, char **argv)
     //terrain
     Texture terrain_hor = Texture("resources/textures/Grass_09-256x256.png", 256, 256, true);
     Texture terrain_vert = Texture("resources/textures/Grass_11-256x256.png", 256, 256, true);
-    Terrain terrain = Terrain(50, 11, &terrain_hor, &terrain_vert);
+    Terrain terrain = Terrain(100, 11, &terrain_hor, &terrain_vert);
 
 
     //renderer

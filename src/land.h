@@ -42,7 +42,7 @@ struct Terrain {
     std::vector<Vertex> vert_buf;
 
     Terrain(int size, float scale,  Texture *hor, Texture *vert, float height_map_scale=20,  int height_map_size=256): 
-    size(size), hor(hor), vert(vert), i_height_map_scale(1 / height_map_scale), height_map_size(height_map_size) 
+    size(size), hor(hor), vert(vert),  height_map_size(height_map_size) , i_height_map_scale(1 / height_map_scale)
     {
         //hor and vert shoulbe the same size
         vert_buf.resize(size * size);
@@ -90,7 +90,7 @@ struct Terrain {
     inline float
     get_height(float x, float y){
     // x, y in [-1, 1]
-        return bilinear_inter(height_map.data(), height_map_size, height_map_size, x * i_height_map_scale + 0.5 * size, y* i_height_map_scale + 0.5 * size) - 1;
+        return  1.5 * bilinear_inter(height_map.data(), height_map_size, height_map_size, x * i_height_map_scale + 0.5 * size, y* i_height_map_scale + 0.5 * size) - 1;
     }
 
     inline vec2

@@ -119,7 +119,7 @@ struct Model {
     vec3 base_color;
 
     Model(Mesh &mesh, Texture *texture=nullptr, int w=0, int h=0): 
-        texture(texture), mesh(mesh)   
+         mesh(mesh), texture(texture)
     {
         scale_v = vec3(1, 1, 1);
         rotation_v = vec3();
