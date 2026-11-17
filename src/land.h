@@ -100,6 +100,8 @@ struct Terrain {
 
     inline vec3
     get_texture(float x, float z, float f, int mip) {
+        if (f <= 0.3) return vert->get_texture(x, z, mip);
+        if (f >= 0.7) hor->get_texture(x, z, mip);
         return f * hor->get_texture(x, z, mip) + (1 - f) * vert->get_texture(x, z, mip);
     }
 

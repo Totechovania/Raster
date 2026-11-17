@@ -588,9 +588,18 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
 
                                 vec3 color;
                                 
-                                if (PSI.terrain_mode) color = PSI.terrain->get_texture(uv.x, uv.y, norm_inter.y * 0.7, m0)* (1.0f - f) 
-                                + PSI.terrain->get_texture(uv.x, uv.y, norm_inter.y * 0.7, m1)* f;
-                                else color= PSI.model->get_texture(uv.x, uv.y, m0) * (1.0f - f) + PSI.model->get_texture(uv.x, uv.y, m1) * f;
+                                if (PSI.terrain_mode) {
+                                    if (f <= 0.3f) color = PSI.terrain->get_texture(uv.x, uv.y, norm_inter.y, m0);
+                                    else if (f >= 0.7f) color = PSI.terrain->get_texture(uv.x, uv.y, norm_inter.y, m1);
+                                    else color = PSI.terrain->get_texture(uv.x, uv.y, norm_inter.y, m0)* (1.0f - f) 
+                                   + PSI.terrain->get_texture(uv.x, uv.y, norm_inter.y, m1)* f;
+                                }
+                                else {
+                                    if (f <= 0.3f) color = PSI.model->get_texture(uv.x, uv.y, m0);
+                                    else if (f >= 0.7f) color = PSI.model->get_texture(uv.x, uv.y, m1);
+                                    else color= PSI.model->get_texture(uv.x, uv.y, m0) * (1.0f - f) + PSI.model->get_texture(uv.x, uv.y, m1) * f;
+                                
+                                }
 
                                 color = color * (255 * (l_light * 0.85 + 0.15));
                                 
@@ -608,7 +617,10 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
                             else if (mode == RENDER_MODE::MIP_LEVELS_DER) {
                                 //const vec3  c  = model.get_texture(u, v, m0) * (1.0f - f) + model.get_texture(u, v, m1) * f;
 
-                                const vec3 color = mip_debug_color(m0, max_mip) * (1.0f - f) + mip_debug_color(m1, max_mip) * f;
+                                vec3 color;
+                                if (f <= 0.3f) color = mip_debug_color(m0, max_mip);
+                                else if (f >= 0.7f) color = mip_debug_color(m1, max_mip);
+                                else color = mip_debug_color(m0, max_mip) * (1.0f - f) + mip_debug_color(m1, max_mip) * f;
 
                                 pixels[4 * i + 0] = color[0] * 255;
                                 pixels[4 * i + 1] = color[1] * 255;
