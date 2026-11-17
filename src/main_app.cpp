@@ -197,7 +197,7 @@ int main(int argc, char **argv)
     Texture porcelain_tx = Texture("resources/textures/porcelain.jpg", 640, 480);
    
 
-    Model b1 = Model(b, &porcelain_tx).scale(vec3(1, 1, 1));
+    Model b1 = Model(b, &porcelain_tx);
     
     b1.id = 0;
     models.push_back(b1);

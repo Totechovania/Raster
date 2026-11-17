@@ -608,11 +608,13 @@ inline void Renderer::rasterize_triangle(Vertex& v1, Vertex& v2, Vertex& v3, REN
                                 }
                             }
                             else if (mode == RENDER_MODE::UV){ 
-                                float u = uv.x - std::floor(uv.x);
-                                float v = uv.y - std::floor(uv.y);
+                                float u = uv.x  - 1e-6f- std::floor(uv.x - 1e-6f);
+                                
+                                float v = uv.y - 1e-6f - floorf(uv.y - 1e-6f);
+                                if (v >= 1.0f) v = 0.0f;
 
-                                pixels[4 * i + 0] = 255 * u;
-                                pixels[4 * i + 1] = 255 * v;
+                                pixels[4 * i + 0] = static_cast<uint8_t>(u * 255.0f);
+                                pixels[4 * i + 1] = static_cast<uint8_t>(v * 255.0f);
                             } 
                             else if (mode == RENDER_MODE::MIP_LEVELS_DER) {
                                 //const vec3  c  = model.get_texture(u, v, m0) * (1.0f - f) + model.get_texture(u, v, m1) * f;

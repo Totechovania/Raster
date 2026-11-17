@@ -69,6 +69,10 @@ struct Texture {
 
         if (W == 0 || H ==0) return vec3();
 
+
+        x -= 1e-6;
+        y -= 1e-6;
+
         x -= std::floor(x);
         y -= std::floor(y);
 
